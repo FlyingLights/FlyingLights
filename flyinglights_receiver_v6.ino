@@ -1,3 +1,4 @@
+//This file is written to run on a Feather M0 Lora 433Mhz
 
 //include the fastled library for driving the RGB LEDs
 #include <FastLED.h>
@@ -17,11 +18,10 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 #define SPIN 11 // THE PIN NUMBER ON THE BOARD THAT THE SKIDS DATA WIRE IS CONNECTED TO
 #define TPIN 10  // THE PIN NUMBER ON THE BOARD THAT THE TAIL DATA WIRE IS CONNECTED TO
 
-
-
+// this defines the number of rows (horizontal strips) and
+// colums (number of LEDS on the longest strip
 #define COLUMNS 37 // THE NUMBER OF COLUMNS OF CANOPY LEDS
 #define ROWS 8 // THE NUMBER OF ROWS OF CANOPY LEDS
-
 
 /*
   for the three lines below it can be worth setting one more
@@ -31,7 +31,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 #define STOTALPIXELS 23 //total number of pixels on the skids
 #define TTOTALPIXELS 47 //TOTALNUMBER OF PIXELS ON THE tail
 
-// set up some useful colours for easy reference
+// set up some useful colours for easy reference later
 #define BLUE 0x0000FF
 #define RED 0xFF0000
 #define GREEN 0x00FF00
@@ -54,10 +54,11 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 #define GREY 0x101010
 #define DARKGREY 0x060606
 
-// prefined hue colours
+// prefined hue colours. These come from the FASTLED library
 //  HUE_RED = 0, HUE_ORANGE = 32, HUE_YELLOW = 64, HUE_GREEN = 96,
 //  HUE_AQUA = 128, HUE_BLUE = 160, HUE_PURPLE = 192, HUE_PINK = 224
 
+// reference pixels
 #define TAILFINFIRST 28 // THE FIRST TAIL FIN PIXEL
 #define TAILFINLAST 46 // THE LAST TAIL FIN PIXEL
 #define SKIDSFIRST 4 // THE FIRST SKIDS PIXEL
@@ -96,13 +97,12 @@ uint8_t m; //just a handy reusable 8bit unsigned integer!
 
 void setup()
 {
-
   //setup the FastLED strips with the correct led type, pin and array reference
   FastLED.addLeds<WS2812, CPIN, GRB>(cstrip, CTOTALPIXELS);
   FastLED.addLeds<WS2812, TPIN, GRB>(tstrip, TTOTALPIXELS);
   FastLED.addLeds<WS2812, SPIN, GRB>(sstrip, STOTALPIXELS);
 
-
+  // only necessary for debugging
   Serial.begin(9600);
 
   if (!rf95.init())
@@ -112,13 +112,11 @@ void setup()
 void loop()
 {
 
-  radiocheck();
+  radiocheck(); //get the data from the radio
 
-  switch (radio.mode) {
+  switch (radio.mode) { // go different ways depending on the current radio mode
 
-    case 1:
-
-      //run mode when radio.mode=1
+    case 1: //run mode when radio.mode=1
 
       ColourCanopy (DULLGREEN);
       ColourTailBoom (DULLPINK);
@@ -141,23 +139,18 @@ void loop()
       ColourMergeAllUntil(19000, DULLRED, DULLYELLOW);
       ColourMergeAllUntil(23000, GREY, GREEN);
 
-
-
       ColourCanopy (DULLORANGE);
       ColourTailBoom (DULLBLUE);
       ColourTailFin (DULLPINK);
       ColourSkidsSide (DULLGREEN);
       ColourSkidsUnder (DULLRED);
 
-
       Show();
 
       Finish();
       break;
 
-    case 2:
-      //ready mode when radio.mode=2
-
+    case 2:  //ready mode when radio.mode=2
 
       HueSparkleAll( 0.8, m, n, 200);
       ColourTail(BLACK);
@@ -171,16 +164,14 @@ void loop()
 
       break;
 
-    case 3:
-      // stop mode when radio.mode=3
+    case 3:  // stop mode when radio.mode=3
       ColourCanopy (BLACK);
       ColourTail(BLACK);
       ColourSkids (BLACK);
       Show();
       break;
 
-    case 4:
-      // demo mode when radio.mode=4
+    case 4:   // demo mode when radio.mode=4
       ColourCanopy (DARKGREY);
       ColourTail(DARKGREY);
       ColourSkids (DARKGREY);
@@ -194,7 +185,7 @@ void loop()
 }
 
 
-void radiocheck()
+void radiocheck()  // this is used to check the LORA radio for incoming data
 {
   if (rf95.available())
   {
@@ -218,7 +209,9 @@ void radiocheck()
 
   }
 }
-void printout()
+
+
+void printout() // just for serial debugging
 {
 
   Serial.print(radio.mode);
@@ -270,7 +263,7 @@ void printout()
 
 }
 
-void WaitUntil(uint32_t waituntil)
+void WaitUntil(uint32_t waituntil) // just wait until a certain number of milliseconds has been reached. Keep checking the radio.
 {
   while (radiomillis < waituntil)
   {
@@ -279,37 +272,37 @@ void WaitUntil(uint32_t waituntil)
   }
 }
 
-void ColourCanopy(uint32_t colour)
+void ColourCanopy(uint32_t colour) // set the whole canopy to a solid colour
 {
   fill_solid( &(cstrip[0]), CTOTALPIXELS , colour );
 }
 
-void ColourTail(uint32_t colour)
+void ColourTail(uint32_t colour)  // set the whole tail to a solid colour
 {
   fill_solid( &(tstrip[0]), TTOTALPIXELS , colour );
 }
 
-void ColourSkids(uint32_t colour)
+void ColourSkids(uint32_t colour)  // set the whole skids to a solid colour
 {
   fill_solid( &(sstrip[0]), STOTALPIXELS , colour );
 }
 
-void ColourTailFin(uint32_t colour)
+void ColourTailFin(uint32_t colour) // set the tail fin to a solid colour
 {
   fill_solid( &(tstrip[TAILFINFIRST]), TAILFINLAST - TAILFINFIRST + 1 , colour );
 }
 
-void ColourTailBoom(uint32_t colour)
+void ColourTailBoom(uint32_t colour) // set the tail boom to a solid colour
 {
   fill_solid( &(tstrip[BOOMFRONT]), BOOMREAR - BOOMFRONT + 1 , colour );
 }
 
-void ColourSkidsSide(uint32_t colour)
+void ColourSkidsSide(uint32_t colour)  // set the side of the skids to a solid colour
 {
   fill_solid( &(sstrip[SKIDSFIRST]), SKIDSLAST - SKIDSFIRST + 1 , colour );
 }
 
-void ColourSkidsUnder(uint32_t colour)
+void ColourSkidsUnder(uint32_t colour) // set the underside of the skids to a solic colour
 {
   fill_solid( &(sstrip[UNDERFRONTFIRST]), UNDERFRONTLAST - UNDERFRONTFIRST + 1 , colour );
   fill_solid( &(sstrip[UNDERREARFIRST]), UNDERREARLAST - UNDERREARFIRST + 1 , colour );
@@ -358,7 +351,7 @@ void Show()
 
 
 
-void Finish()
+void Finish()  // when this is reached it will hold until another mode is selected 
 {
   while (radiomillis < 1999999999)
   {
@@ -368,7 +361,7 @@ void Finish()
 
 }
 
-void HueSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
+void HueSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade) 
 {
 
   howmany1 *= 100;
