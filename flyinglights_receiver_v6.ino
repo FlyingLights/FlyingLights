@@ -1,4 +1,5 @@
-//This file is written to run on a Feather M0 Lora 433Mhz
+// This file is written to run on a Feather M0 Lora 433Mhz
+// https://www.adafruit.com/product/3179
 
 //include the fastled library for driving the RGB LEDs
 #include <FastLED.h>
