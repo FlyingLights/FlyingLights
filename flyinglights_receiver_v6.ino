@@ -135,7 +135,7 @@ void loop()
       WaitUntil(10000);
 
       ColourMergeAllUntil(12000, DULLPINK, GREEN);
-            ColourMergeAllUntil(16000, BLACK, CYAN);
+      ColourMergeAllUntil(16000, BLACK, CYAN);
       ColourMergeAllUntil(19000, DULLRED, DULLYELLOW);
       ColourMergeAllUntil(23000, GREY, GREEN);
 
@@ -478,7 +478,6 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
   {
     uint32_t elapsed = radiomillis - starttime;
     uint32_t fraction = (elapsed << 8) / totalduration;
-  //  uint8_t fraction2 = byte(fraction);
     uint8_t rrr = lerp8by8(rr, r, fraction);
     uint8_t ggg = lerp8by8(gg, g, fraction);
     uint8_t bbb = lerp8by8(bb, b, fraction);
