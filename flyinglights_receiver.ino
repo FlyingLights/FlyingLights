@@ -51,7 +51,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 #define WHITE 0xFFFFFF
 #define LIGHTGREY 0x222222
 #define GREY 0x101010
-#define DARKGREY 0x060606
+#define DULLGREY 0x060606
 
 // prefined hue colours. These come from the FASTLED library
 //  HUE_RED = 0, HUE_ORANGE = 32, HUE_YELLOW = 64, HUE_GREEN = 96,
