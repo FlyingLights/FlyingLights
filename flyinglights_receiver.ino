@@ -1,4 +1,4 @@
-// This code is written to run on a Feather M0 Lora 433Mhz
+// This code is written to run on a Feather M0 LORA 433Mhz
 // https://www.adafruit.com/product/3179
 
 //include the fastled library for driving the RGB LEDs
@@ -10,7 +10,7 @@
 #define RFM95_CS 8
 #define RFM95_RST 4
 #define RFM95_INT 3
-// Define the operating frequency
+// Define the operating frequency   **** you only need to change the line below to use a different frequency
 #define RF95_FREQ 433.0
 //initialise the radio
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
