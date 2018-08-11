@@ -311,7 +311,6 @@ void loop()
       // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
       // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
 
-
       HueTwoSparkleAll( 0.8, m, n, 200);
       ColourTail(BLACK);
       ColourSkids (BLACK);
@@ -320,7 +319,6 @@ void loop()
         n += 1;
       }
       m += 1;
-
 
       break; // end of ready mode
 
@@ -363,7 +361,6 @@ void radiocheck()  // this is used to check the LORA radio for incoming data
     uint8_t len = sizeof(buf);
     if (rf95.recv(buf, &len))
     {
-      //    digitalWrite(led, HIGH);
 
       memcpy(&radio, buf, sizeof(radio));
     }
@@ -677,4 +674,3 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
   }
 
 }
-
