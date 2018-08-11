@@ -648,7 +648,6 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
     ColourTail(colour);
     Show();
     radiocheck();
-
   }
 
 }
