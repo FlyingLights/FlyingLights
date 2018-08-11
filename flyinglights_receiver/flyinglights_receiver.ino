@@ -350,7 +350,6 @@ void loop()
   } // end of switch case
 } // end of loop
 
-
 void radiocheck()  // this is used to check the LORA radio for incoming data
 // it must be included in all "until" functions
 {
@@ -361,21 +360,15 @@ void radiocheck()  // this is used to check the LORA radio for incoming data
     uint8_t len = sizeof(buf);
     if (rf95.recv(buf, &len))
     {
-
       memcpy(&radio, buf, sizeof(radio));
     }
     else
     {
       Serial.println("recv failed");
     }
-
-
     radiomillis = radio.millisec[3] << 24 | (uint32_t)radio.millisec[2] << 16 | (uint32_t)radio.millisec[1] << 8 | (uint32_t)radio.millisec[0];
-
-
   }
 }
-
 
 void printout() // just for serial debugging
 {
@@ -417,7 +410,6 @@ void printout() // just for serial debugging
       Serial.print(" O-------X");
     }
 
-
   }
 
   //   Serial.print("got request: ");
@@ -425,7 +417,6 @@ void printout() // just for serial debugging
   Serial.print(" RSSI: ");
   Serial.println(rf95.lastRssi(), DEC);
   Serial.println();
-
 
 }
 
@@ -523,8 +514,6 @@ void Show()
   FastLED.show();
 }
 
-
-
 void Finish()  // when this is reached it will hold until another mode is selected
 {
   while (radiomillis < 1999999999)
@@ -541,10 +530,7 @@ void HueTwoSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fad
   howmany1 *= 100;
 
   for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
-
-
     if (random16(10000) < howmany1) {
-
       if (random8() < 128) {
         cstrip[j].setHue(hue1);
       }
@@ -554,7 +540,6 @@ void HueTwoSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fad
       }
     }
   }
-
 
   FastLED.show();
 
@@ -568,10 +553,7 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
   howmany1 *= 100;
 
   for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
-
-
     if (random16(10000) < howmany1) {
-
       if (random8() < 128) {
         cstrip[j].setHue(hue1);
       }
@@ -583,9 +565,7 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
   }
 
   for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
-
     if (random16(10000) < howmany1) {
-
       if (random8() < 128) {
         tstrip[j].setHue(hue1);
       }
@@ -600,7 +580,6 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
   for (uint16_t j = 0; j < STOTALPIXELS; j++) {
 
     if (random16(10000) < howmany1) {
-
       if (random8() < 128) {
         sstrip[j].setHue(hue1);
       }
@@ -610,7 +589,6 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
       }
     }
   }
-
 
   FastLED.show();
 
