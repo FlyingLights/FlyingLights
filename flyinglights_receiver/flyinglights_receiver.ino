@@ -5,8 +5,9 @@
 #include <FastLED.h>
 
 // setup for 433mhz lora radio
-#include <SPI.h>
-#include <RH_RF95.h>
+#include <SPI.h> //include SPI library
+#include <RH_RF95.h> //include radiohead library
+// setup the correct pins
 #define RFM95_CS 8
 #define RFM95_RST 4
 #define RFM95_INT 3
@@ -77,7 +78,7 @@ CRGB tstrip[TTOTALPIXELS]; //setup the array for the tail leds
 struct dataStruct {
   uint8_t mode;  //mode 1=run,2=ready,3=stop,4=demo
   uint8_t millisec[4]; //millisecond timer is split up into 4 bytes
-  uint8_t spectrum[7]; //spectrum analyser over seven channels 
+  uint8_t spectrum[7]; //spectrum analyser over seven channels
 } radio;
 
 // radiomillis is the millisecond signal being sent over the radio. It is used
@@ -110,17 +111,142 @@ void loop()
 {
 
   radiocheck(); //get the data from the radio
+  printout(); //serial.print just for debugging
 
   switch (radio.mode) { // go different ways depending on the current radio mode
 
     case 1: //run mode when radio.mode=1
-      
+
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // THIS IS WHERE THE CODE GOES THAT RUNS THE NIGHT FLYING ROUTINE /////////////////////////////////////////////////////
-      // ONLY USE COLOUR SUBROUTINES IN HERE FOR CLARITY ////////////////////////////////////////////////////////////////////
+      // ONLY USE FUNCTIONS IN HERE FOR CLARITY /////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      // ***********  SPECIAL FUNCTIONS THAT CAN BE USED: ***********
+
+      // 1. Show();
+      // This shows the pre-selected static colours on the canopy.
+      // Not needed with dynamic functions.
+
+      // 2. WaitUntil(TIME_IN_MILLISECONDS);
+      // This function waits *unitl* TIME_IN_MILLISECONDS is reached.
+
+      // 3. Finish();
+      // This is almost always placed at the end of the routine.
+      // It waits here until another mode is selected. Without it
+      // the run routine will repeat again.
+
+      // ***********  STATIC FUNCTIONS THAT CAN BE USED: ***********
+
+      // * STATIC COLOUR FUNCTIONS
+
+      // 1. ColourCanopy (COLOUR);
+      // This fills the canopy with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 2. ColourTail (COLOUR);
+      // This fills the whole tail with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 3. ColourSkids (COLOUR);
+      // This fills the whole skids with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 4. ColourTailBoom (COLOUR);
+      // This fills the tail boom with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 5. ColourTailFin (COLOUR);
+      // This fills the tail fin with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 6. ColourSkidsUnder (COLOUR);
+      // This fills the tail boom with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 7. ColourSkidsSide (COLOUR);
+      // This fills the side of the skids with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 8. ColourAll (COLOUR);
+      // This fills the whole heli with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+
+      // * STATIC HUE FUNCTIONS
+
+      // 1. HueCanopy (HUE);
+      // This fills the canopy with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 2. HueTail (HUE);
+      // This fills the tail with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 3. HueSkids (HUE);
+      // This fills the whole skids with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 4. HueTailBoom (HUE);
+      // This fills the tail boom with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 5. HueTailFin (HUE);
+      // This fills the tail fin with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 6. HueSkidsUnder (HUE);
+      // This fills the tail boom with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 7. HueSkidsSide (HUE);
+      // This fills the side of the skids with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 8. HueAll (HUE);
+      // This fills the whole heli with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+
+      // ***********  DYNAMIC "UNTIL" FUNCTIONS THAT CAN BE USED: ***********
+
+      // * COLOUR "UNTIL" FUNCTIONS
+
+      // 1. ColourMergeAllUntil(TIME_IN_MILLISECONDS, COLOUR_1, COLOUR_2);
+
+      // This fills the heli with COLOUR_1 which merges to COLOUR_2.
+      // Runs until TIME_IN_MILLIDECONDS is reached.
+
+      // * HUE "UNTIL" FUNCTIONS
+
+      // 1. HueTwoSparkleCanopyUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
+
+      // This sparkles the canopy with two hues (HUE_1 and HUE_2).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+      // tail and skids do not change from previously set colours
+
+      // 2. HueTwoSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
+
+      // This sparkles the whole heli with two hues (HUE_1 and HUE_2).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
 
       ColourCanopy (DULLGREEN);
       ColourTailBoom (DULLPINK);
@@ -152,18 +278,41 @@ void loop()
       Show();
 
       Finish();
-      
+
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // END OF THE NIGHT FLYING ROUTINE ////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      
-      break;
+
+      break; // end of run mode
 
     case 2:  //ready mode when radio.mode=2
 
-      HueSparkleAll( 0.8, m, n, 200);
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // READY MODE IS GENERALLY USED WHEN THE HELI IS WAITING TO START ROUTINE /////////////////////////////////////////////
+      // CAN USE STATIC COLOURS OR DYNAMIC PATTERNS BUT NOT "UNTIL" FUNCTIONS   /////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      // *********** FUNCTIONS FOR READY AND DEMO MODES  ***********
+
+      // 1. HueTwoSparkleCanopy(PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
+
+      // This sparkles the canopy with two hues (HUE_1 and HUE_2).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // tail and skids do not change from previously set colours
+
+      // 2. HueTwoSparkleAll(PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
+
+      // This sparkles the whole heli with two hues (HUE_1 and HUE_2).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
+
+      HueTwoSparkleAll( 0.8, m, n, 200);
       ColourTail(BLACK);
       ColourSkids (BLACK);
 
@@ -173,30 +322,39 @@ void loop()
       m += 1;
 
 
-      break;
+      break; // end of ready mode
 
     case 3:  // stop mode when radio.mode=3
-      ColourCanopy (BLACK);
-      ColourTail(BLACK);
-      ColourSkids (BLACK);
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // STOP MODE IS GENERALLY USED TO SWITCH OFF ALL LEDS /////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      ColourAll (BLACK);
       Show();
-      break;
+      break; // end of stop mode
 
     case 4:   // demo mode when radio.mode=4
-      ColourCanopy (DARKGREY);
-      ColourTail(DARKGREY);
-      ColourSkids (DARKGREY);
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // DEMO MODE //////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // CAN USE STATIC COLOURS OR DYNAMIC PATTERNS BUT NOT "UNTIL" FUNCTIONS   /////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      ColourAll (DULLGREY);
       Show();
-      break;
-  }
+      break; // end of demo mode
 
-  printout();
-
-
-}
+  } // end of switch case
+} // end of loop
 
 
 void radiocheck()  // this is used to check the LORA radio for incoming data
+// it must be included in all "until" functions
 {
   if (rf95.available())
   {
@@ -298,6 +456,14 @@ void ColourSkids(uint32_t colour)  // set the whole skids to a solid colour
   fill_solid( &(sstrip[0]), STOTALPIXELS , colour );
 }
 
+void ColourAll(uint32_t colour) // set the whole heli to a solid colour and show it
+{
+  ColourCanopy(colour);
+  ColourTail(colour);
+  ColourSkids(colour);
+  Show();
+}
+
 void ColourTailFin(uint32_t colour) // set the tail fin to a solid colour
 {
   fill_solid( &(tstrip[TAILFINFIRST]), TAILFINLAST - TAILFINFIRST + 1 , colour );
@@ -362,7 +528,7 @@ void Show()
 
 
 
-void Finish()  // when this is reached it will hold until another mode is selected 
+void Finish()  // when this is reached it will hold until another mode is selected
 {
   while (radiomillis < 1999999999)
   {
@@ -372,7 +538,7 @@ void Finish()  // when this is reached it will hold until another mode is select
 
 }
 
-void HueSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade) 
+void HueTwoSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 {
 
   howmany1 *= 100;
@@ -399,7 +565,7 @@ void HueSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 
 }
 
-void HueSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
+void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 {
 
   howmany1 *= 100;
@@ -458,28 +624,35 @@ void HueSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 }
 
 
-
-void HueSparkleAllUntil(uint32_t waituntil, float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
+void HueTwoSparkleAllUntil(uint32_t waituntil, float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 {
   while (radiomillis < waituntil)
   {
     radiocheck();
-    HueSparkleAll(howmany1, hue1, hue2, fade);
+    HueTwoSparkleAll(howmany1, hue1, hue2, fade);
+  }
+}
+void HueTwoSparkleCanopyUntil(uint32_t waituntil, float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
+{
+  while (radiomillis < waituntil)
+  {
+    radiocheck();
+    HueTwoSparkleCanopy(howmany1, hue1, hue2, fade);
   }
 }
 
 
 void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolour) { // merge from one solid colour to another on canopy, tail and skids
-  
-// until = The radiomillis when this colour merge ends
-// startcolour = The starting RGB colour
-// endcolour = The ending RGB colour
-  
-  uint8_t rr = startcolour >> 16;
+
+  // until = The radiomillis when this colour merge ends
+  // startcolour = The starting RGB colour
+  // endcolour = The ending RGB colour
+
+  uint8_t rr = startcolour >> 16; //dismantle the colour into RGB components
   uint8_t gg = startcolour >> 8;
   uint8_t bb = startcolour;
-  
-  uint8_t r = endcolour >> 16;
+
+  uint8_t r = endcolour >> 16; //dismantle the colour into RGB components
   uint8_t g = endcolour >> 8;
   uint8_t b = endcolour;
 
@@ -490,11 +663,11 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
 
   {
     uint32_t elapsed = radiomillis - starttime;
-    uint32_t fraction = (elapsed << 8) / totalduration;
-    uint8_t rrr = lerp8by8(rr, r, fraction);
+    uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
+    uint8_t rrr = lerp8by8(rr, r, fraction); //interpolate between rr & r
     uint8_t ggg = lerp8by8(gg, g, fraction);
     uint8_t bbb = lerp8by8(bb, b, fraction);
-    uint32_t colour = (uint32_t)rrr << 16 | (uint32_t)ggg << 8 | (uint32_t)bbb;
+    uint32_t colour = (uint32_t)rrr << 16 | (uint32_t)ggg << 8 | (uint32_t)bbb; //put the colour back together as 24bit RGB colour
     ColourCanopy(colour);
     ColourSkids(colour);
     ColourTail(colour);
