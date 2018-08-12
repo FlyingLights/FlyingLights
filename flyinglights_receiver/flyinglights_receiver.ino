@@ -21,7 +21,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 #define TPIN 10  // THE PIN NUMBER ON THE BOARD THAT THE TAIL DATA WIRE IS CONNECTED TO
 
 // this defines the number of rows (horizontal strips) and
-// colums (number of LEDS on the longest strip
+// columns (number of LEDS on the longest strip
 #define COLUMNS 37 // THE NUMBER OF COLUMNS OF CANOPY LEDS
 #define ROWS 8 // THE NUMBER OF ROWS OF CANOPY LEDS
 
@@ -85,6 +85,10 @@ struct dataStruct {
 // during run mode but set to 2000000000 when in other modes
 uint32_t radiomillis;
 
+// used to put a bright spot on the top of the spectrumtop function bars
+uint8_t leftspectrumtop[7];
+uint8_t rightspectrumtop[7];
+
 // this defines the LED matrix on the canopy. The numbers are the addresses of the LEDs in rows from FRONT to BACK, starting at the bottom and working up
 // 999 refers to an LED that is not present
 uint16_t leftcanopy [][37] = {
@@ -112,9 +116,13 @@ uint16_t rightcanopy [][37] = {
 
 uint8_t n; //just a handy reusable 8bit unsigned integer!
 uint8_t m; //just a handy reusable 8bit unsigned integer!
+uint8_t leftmax[7];
+uint8_t rightmax[7];
 
 void setup()
 {
+
+
   //setup the FastLED strips with the correct led type, pin and array reference
   FastLED.addLeds<WS2812, CPIN, GRB>(cstrip, CTOTALPIXELS);
   FastLED.addLeds<WS2812, TPIN, GRB>(tstrip, TTOTALPIXELS);
@@ -123,6 +131,28 @@ void setup()
   // only necessary for debugging
   Serial.begin(9600);
 
+  //work out which pixel in each row is the last "real" pixel rather than a 999 blank
+  // this is used for the specttrumtops function. Just looks nicer!
+  for (uint8_t f = 0; f < 7; f++)
+  {
+    for (uint8_t g = 0; g < COLUMNS; g++)
+    {
+      if (leftcanopy[f+1][g] < 999) {
+        leftmax[f] = g;
+      }
+      if (rightcanopy[f+1][g] < 999) {
+        rightmax[f] = g;
+      }
+    }
+
+    Serial.print(f);
+    Serial.print(" leftmax:");
+        Serial.print(leftmax[f]);
+            Serial.print(" rightmax:");
+        Serial.println(rightmax[f]);
+  }
+  
+
   if (!rf95.init())
     Serial.println("init failed");
 }
@@ -130,7 +160,7 @@ void setup()
 void loop()
 {
 
-  radiocheck(); //get the data from the radio
+  RadioCheck(); //get the data from the radio
   printout(); //serial.print just for debugging
 
   switch (radio.mode) { // go different ways depending on the current radio mode
@@ -251,6 +281,29 @@ void loop()
       // This fills the heli with COLOUR_1 which merges to COLOUR_2.
       // Runs until TIME_IN_MILLIDECONDS is reached.
 
+      // 2. ColourOneSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
+
+      // This sparkles the whole heli with one colour (COLOUR_1).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+      // 3. ColourOneSparkleCanopyTailBoomUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
+
+      // This sparkles the canopy and tail boom with one colour (COLOUR_1).
+      // ALSO KEEPS THE TAIL FIN THAT SOLID COLOUR TO STOP IT FADING
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+      // 4. ColourMergeAllSparklingCanopyTailBoomUntil (TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, START_COLOUR, END_COLOUR, FADE_SPEED)
+      // This sparkles the canopy and tail boom with the rest of the heli solid colour.
+      // The colour merges from COLOUR_1 to COLOUR_2.
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100 and is just for canopy and tail boom.
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+
       // * HUE "UNTIL" FUNCTIONS
 
       // 1. HueTwoSparkleCanopyUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
@@ -268,38 +321,63 @@ void loop()
       // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
       // Runs until TIME_IN_MILLISECONDS is reached
 
-      // 3. HueMergeAllUntil(TIME_IN_MILLISECONDS, HUE_1, HUE_2);
+      // 3. HueOneSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, FADE_SPEED)
+
+      // This sparkles the whole heli with one hue (HUE_1).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+      // 4. HueMergeAllUntil(TIME_IN_MILLISECONDS, HUE_1, HUE_2);
 
       // This fills the heli with HUE_1 which merges to HUE_2.
-      // Runs until TIME_IN_MILLIDECONDS is reached.
+      // Runs until TIME_IN_MILLISECONDS is reached.
+      
+      SpectrumTop(900000, DULLCYAN, RED, 100);
+      ColourAll(BLACK);
+      WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
+      ColourMergeAllSparklingCanopyTailBoomUntil (19279, 0.3, BLACK, WHITE, 200);
+      ColourSkids(WHITE);
+      ColourTailFin(WHITE);
+      ColourOneSparkleCanopyTailBoomUntil(19365, 0.3, WHITE, 200); //up to chord change
+      ColourOneSparkleCanopyTailBoomUntil(21942, 1, WHITE, 200); //up to "we're marooned on a small island"
+      ColourMergeAllSparklingCanopyTailBoomUntil (23225, 1, WHITE, GREEN, 200); //merge through to "island" at 23225
+      ColourOneSparkleCanopyTailBoomUntil(25066, 1, GREEN, 200); //up to "in an endless"
+      ColourMergeAllSparklingCanopyTailBoomUntil (26342, 1, GREEN, BLUE, 200); //merge through to "sea" at 26342
+      ColourOneSparkleCanopyTailBoomUntil(28532, 1, BLUE, 200); //up to a point where it starts merging to yellow
+      ColourMergeAllSparklingCanopyTailBoomUntil(29164, 1, BLUE, YELLOW, 200); //merged as it gets to sand
+      ColourOneSparkleCanopyTailBoomUntil(32322, 1, YELLOW, 200); //up to dramatic
+      ColourMergeAllUntil(32722, BLACK, RED); //up to "but tonight"
 
-      ColourCanopy (DULLGREEN);
-      ColourTailBoom (DULLPINK);
-      ColourTailFin (DULLRED);
-      ColourSkidsSide (DULLBLUE);
-      ColourSkidsUnder (DULLCYAN);
-      Show();
-      WaitUntil(5000);
 
-      HueCanopy (HUE_BLUE);
-      ColourTailBoom(DULLMAGENTA);
-      ColourTailFin (DULLBLUE);
-      ColourSkidsSide (DULLORANGE);
-      ColourSkidsUnder (DULLGREEN);
-      Show();
-      WaitUntil(10000);
+      //      ColourCanopy (DULLGREEN);
+      //      ColourTailBoom (DULLPINK);
+      //      ColourTailFin (DULLRED);
+      //      ColourSkidsSide (DULLBLUE);
+      //      ColourSkidsUnder (DULLCYAN);
+      //      Show();
+      //      WaitUntil(5000);
+      //
+      //      HueCanopy (HUE_BLUE);
+      //      ColourTailBoom(DULLMAGENTA);
+      //      ColourTailFin (DULLBLUE);
+      //      ColourSkidsSide (DULLORANGE);
+      //      ColourSkidsUnder (DULLGREEN);
+      //      Show();
+      //      WaitUntil(10000);
+      //
+      //      ColourMergeAllUntil(12000, DULLPINK, GREEN);
+      //      ColourMergeAllUntil(16000, BLACK, CYAN);
+      //      ColourMergeAllUntil(19000, DULLRED, DULLYELLOW);
+      //      ColourMergeAllUntil(23000, GREY, GREEN);
+      //
+      //      ColourCanopy (DULLORANGE);
+      //      ColourTailBoom (DULLBLUE);
+      //      ColourTailFin (DULLPINK);
+      //      ColourSkidsSide (DULLGREEN);
+      //      ColourSkidsUnder (DULLRED);
 
-      ColourMergeAllUntil(12000, DULLPINK, GREEN);
-      ColourMergeAllUntil(16000, BLACK, CYAN);
-      ColourMergeAllUntil(19000, DULLRED, DULLYELLOW);
-      ColourMergeAllUntil(23000, GREY, GREEN);
-
-      ColourCanopy (DULLORANGE);
-      ColourTailBoom (DULLBLUE);
-      ColourTailFin (DULLPINK);
-      ColourSkidsSide (DULLGREEN);
-      ColourSkidsUnder (DULLRED);
-
+      ColourAll(BLACK);
       Show();
 
       Finish();
@@ -335,6 +413,26 @@ void loop()
       // This sparkles the whole heli with two hues (HUE_1 and HUE_2).
       // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
       // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
+      // 3. HueOneSparkleAll(PERCENT_OF_PIXELS_ON, HUE_1, FADE_SPEED)
+
+      // This sparkles the whole heli with one hue (HUE_1).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
+      // 4. ColourOneSparkleAll(PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
+
+      // This sparkles the whole heli with one colour (COLOUR_1).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
+      // 5. ColourOneSparkleCanopyTailBoom(PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
+
+      // This sparkles the canopy and tail boom with one colour (COLOUR_1).
+      // ALSO KEEPS THE TAIL FIN THAT SOLID COLOUR TO STOP IT FADING
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
 
       HueTwoSparkleAll( 0.8, m, n, 200);
       ColourTail(BLACK);
@@ -375,7 +473,7 @@ void loop()
   } // end of switch case
 } // end of loop
 
-void radiocheck()  // this is used to check the LORA radio for incoming data
+void RadioCheck()  // this is used to check the LORA radio for incoming data
 // it must be included in all "until" functions
 {
   if (rf95.available())
@@ -449,7 +547,7 @@ void WaitUntil(uint32_t waituntil) // just wait until a certain number of millis
 {
   while (radiomillis < waituntil)
   {
-    radiocheck();
+    RadioCheck();
     printout();
   }
 }
@@ -543,7 +641,7 @@ void Finish()  // when this is reached it will hold until another mode is select
 {
   while (radiomillis < 1999999999)
   {
-    radiocheck();
+    RadioCheck();
     printout();
   }
 
@@ -569,6 +667,99 @@ void HueTwoSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fad
   FastLED.show();
 
   nscale8(cstrip, CTOTALPIXELS, fade);
+
+}
+
+void HueOneSparkleAll(float howmany1, uint8_t hue1, uint8_t fade)
+{
+
+  howmany1 *= 100;
+
+  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+    if (random16(10000) < howmany1) {
+      cstrip[j].setHue(hue1);
+    }
+  }
+
+  for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
+    if (random16(10000) < howmany1) {
+      tstrip[j].setHue(hue1);
+    }
+  }
+
+
+  for (uint16_t j = 0; j < STOTALPIXELS; j++) {
+    if (random16(10000) < howmany1) {
+      sstrip[j].setHue(hue1);
+    }
+  }
+
+  FastLED.show();
+
+  nscale8(cstrip, CTOTALPIXELS, fade);
+  nscale8(tstrip, TTOTALPIXELS, fade);
+  nscale8(sstrip, STOTALPIXELS, fade);
+
+}
+
+
+
+void ColourOneSparkleCanopyTailBoom(float howmany1, uint32_t colour1, uint8_t fade)
+{
+
+  howmany1 *= 100;
+
+  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+    if (random16(10000) < howmany1) {
+      cstrip[j] = colour1;
+    }
+  }
+
+  for (uint16_t j = BOOMFRONT; j <= BOOMREAR; j++) {
+    if (random16(10000) < howmany1) {
+      tstrip[j] = colour1;
+    }
+  }
+
+  ColourTailFin(colour1);
+
+  FastLED.show();
+
+  nscale8(cstrip, CTOTALPIXELS, fade);
+  nscale8(tstrip, TTOTALPIXELS, fade);
+
+
+}
+
+
+void ColourOneSparkleAll(float howmany1, uint32_t colour1, uint8_t fade)
+{
+
+  howmany1 *= 100;
+
+  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+    if (random16(10000) < howmany1) {
+      cstrip[j] = colour1;
+    }
+  }
+
+  for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
+    if (random16(10000) < howmany1) {
+      tstrip[j] = colour1;
+    }
+  }
+
+  for (uint16_t j = 0; j < STOTALPIXELS; j++) {
+    if (random16(10000) < howmany1) {
+      sstrip[j] = colour1;
+    }
+  }
+
+  FastLED.show();
+
+  nscale8(cstrip, CTOTALPIXELS, fade);
+  nscale8(tstrip, TTOTALPIXELS, fade);
+  nscale8(sstrip, STOTALPIXELS, fade);
 
 }
 
@@ -623,12 +814,38 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 
 }
 
+void ColourOneSparkleCanopyTailBoomUntil(uint32_t waituntil, float howmany1, uint32_t colour1, uint8_t fade)
+{
+  while (radiomillis < waituntil)
+  {
+    RadioCheck();
+    ColourOneSparkleCanopyTailBoom(howmany1, colour1, fade);
+  }
+}
+
+void ColourOneSparkleAllUntil(uint32_t waituntil, float howmany1, uint8_t colour1, uint8_t fade)
+{
+  while (radiomillis < waituntil)
+  {
+    RadioCheck();
+    ColourOneSparkleAll(howmany1, colour1, fade);
+  }
+}
+
+void HueOneSparkleAllUntil(uint32_t waituntil, float howmany1, uint8_t hue1, uint8_t fade)
+{
+  while (radiomillis < waituntil)
+  {
+    RadioCheck();
+    HueOneSparkleAll(howmany1, hue1, fade);
+  }
+}
 
 void HueTwoSparkleAllUntil(uint32_t waituntil, float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 {
   while (radiomillis < waituntil)
   {
-    radiocheck();
+    RadioCheck();
     HueTwoSparkleAll(howmany1, hue1, hue2, fade);
   }
 }
@@ -636,7 +853,7 @@ void HueTwoSparkleCanopyUntil(uint32_t waituntil, float howmany1, uint8_t hue1, 
 {
   while (radiomillis < waituntil)
   {
-    radiocheck();
+    RadioCheck();
     HueTwoSparkleCanopy(howmany1, hue1, hue2, fade);
   }
 }
@@ -656,7 +873,7 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
   uint8_t g = endcolour >> 8;
   uint8_t b = endcolour;
 
-  radiocheck();
+  RadioCheck();
   uint32_t starttime = radiomillis;
   uint32_t totalduration = until - radiomillis;
   while (radiomillis < until)
@@ -672,7 +889,7 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
     ColourSkids(colour);
     ColourTail(colour);
     Show();
-    radiocheck();
+    RadioCheck();
   }
 
 }
@@ -683,7 +900,7 @@ void HueMergeAllUntil (uint32_t until, uint8_t starthue, uint32_t endhue) { // m
   // starthue = The starting 8 bit hue
   // endhue = The ending 8 bit hue
 
-  radiocheck();
+  RadioCheck();
   uint32_t starttime = radiomillis;
   uint32_t totalduration = until - radiomillis;
   while (radiomillis < until)
@@ -697,7 +914,164 @@ void HueMergeAllUntil (uint32_t until, uint8_t starthue, uint32_t endhue) { // m
     HueSkids(huey);
     HueTail(huey);
     Show();
-    radiocheck();
+    RadioCheck();
   }
 
 }
+
+void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1, uint32_t startcolour, uint32_t endcolour, uint8_t fade) { // merge from one colour to another, but with the canopy and tail boom sparkling
+
+  // until = The radiomillis when this colour merge ends
+  // startcolour = The starting RGB colour
+  // endcolour = The ending RGB colour
+
+  howmany1 *= 100;
+  /* this is what it is going to change to. To stop using a float.
+    uint16_t howmany;
+
+    if (howmany1>100) {
+    howmany=100;
+    }
+    else
+    {
+    howmany=howmany1*100;
+    }
+  */
+
+  uint8_t rr = startcolour >> 16; //dismantle the colour into RGB components
+  uint8_t gg = startcolour >> 8;
+  uint8_t bb = startcolour;
+
+  uint8_t r = endcolour >> 16; //dismantle the colour into RGB components
+  uint8_t g = endcolour >> 8;
+  uint8_t b = endcolour;
+
+  RadioCheck();
+  uint32_t starttime = radiomillis;
+  uint32_t totalduration = until - radiomillis;
+  while (radiomillis < until)
+  {
+    uint32_t elapsed = radiomillis - starttime;
+    uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
+    uint8_t rrr = lerp8by8(rr, r, fraction); //interpolate between rr & r
+    uint8_t ggg = lerp8by8(gg, g, fraction);
+    uint8_t bbb = lerp8by8(bb, b, fraction);
+    uint32_t colour = (uint32_t)rrr << 16 | (uint32_t)ggg << 8 | (uint32_t)bbb; //put the colour back together as 24bit RGB colour
+
+    for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        cstrip[j] = colour;
+      }
+    }
+
+    for (uint16_t j = BOOMFRONT; j <= BOOMREAR; j++) {
+      if (random16(10000) < howmany1) {
+        tstrip[j] = colour;
+      }
+    }
+
+    ColourTailFin(colour);
+    ColourSkids(colour);
+    FastLED.show();
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    nscale8(tstrip, TTOTALPIXELS, fade);
+    RadioCheck();
+  }
+
+}
+
+
+// Spectrum analyser function for the canopy
+void Spectrum(uint32_t until, uint32_t colour, uint8_t fade) {
+
+  while (radiomillis < until)
+  {
+    //run down the rows and channels
+    for (uint16_t i = 0; i < 7; i++) {
+      // work out the WIDTH of the HORIZONTAL bars for each channel and put that in y
+      uint16_t  y = (COLUMNS * radio.spectrum[i]) >> 8; //multiply the radio.spectrum signal by the number of columns and divide by 256
+      // run ALONG the bar
+      for (uint16_t j = 0; j < y; j++) {
+        cstrip[(leftcanopy [i + 1][j])] = colour;
+        cstrip[(rightcanopy [i + 1][j])] = colour;
+      }
+    }
+    // show the pixels
+    FastLED.show();
+    //fade
+    nscale8(cstrip, CTOTALPIXELS, fade);
+
+    RadioCheck();
+  }
+}
+
+void SpectrumTop(uint32_t until, uint32_t colour1, uint32_t colour2, uint8_t fade) {
+
+uint8_t tracker;
+  while (radiomillis < until)
+  {
+    tracker+= 1;
+    if (tracker==3) {
+      tracker=0;
+    }
+    //run down the rows and channels
+    for (uint16_t i = 0; i < 7; i++) {
+      // work out the WIDTH of the HORIZONTAL bars for each channel and put that in y
+      uint16_t  y = (COLUMNS * radio.spectrum[i]) >> 8; //multiply the radio.spectrum signal by the number of columns and divide by 256
+      uint16_t j;
+      // run ALONG the bar
+      for (j = 0; j < y; j++) {
+        cstrip[(leftcanopy [i + 1][j])] = colour1;
+        cstrip[(rightcanopy [i + 1][j])] = colour1;
+      }
+
+      
+      // put the right top on
+      if ( rightspectrumtop[i] < j)
+      {
+        if (j > rightmax[i]) {
+        rightspectrumtop[i] = rightmax[i];
+        }
+        else
+        {
+          rightspectrumtop[i] = j;
+        }
+      }
+      else
+      {
+        if (rightspectrumtop[i] > 0 && tracker==0) {
+          rightspectrumtop[i] -= 1;
+        }
+      }
+
+      cstrip[(rightcanopy [i + 1][rightspectrumtop[i]])] = colour2;
+
+// put the left top on it
+      if ( leftspectrumtop[i] < j)
+      {
+        if (j > leftmax[i]) {
+        leftspectrumtop[i] = leftmax[i];
+        }
+        else
+        {
+          leftspectrumtop[i] = j;
+        }
+      }
+      else
+      {
+        if (leftspectrumtop[i] > 0 && tracker==0) {
+          leftspectrumtop[i] -= 1;
+        }
+      }
+      cstrip[(leftcanopy [i + 1][leftspectrumtop[i]])] = colour2;
+
+    }
+    // show the pixels
+    FastLED.show();
+    //fade
+    nscale8(cstrip, CTOTALPIXELS, fade);
+
+    RadioCheck();
+  }
+}
+
