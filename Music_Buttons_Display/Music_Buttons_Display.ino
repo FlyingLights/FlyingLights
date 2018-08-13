@@ -1,6 +1,6 @@
 // This code is designed to run on an Arduino Uno in the ground station
 // It is connected to an Adafruit Music Maker https://www.adafruit.com/product/1790
-// an LCD display and snother UNO with MSGEQ7 spectrum analyser.
+// an LCD display and another UNO with MSGEQ7 spectrum analyser.
 
 // include SPI, MP3, SD and LiquidCrystal libraries
 #include <SPI.h>
