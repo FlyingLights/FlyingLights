@@ -1,6 +1,7 @@
 // This code is designed to run on an Arduino Uno in the ground station
 // Its main functions are to:
-// * Control Adafruit Music Maker https://www.adafruit.com/product/1790
+// * Control Adafruit Music Maker which is playing into a spectrum analyser
+// (https://www.adafruit.com/product/1790)
 // * Output its current status to a 16x2 LCD
 // * take input from 4 momentary buttons and a momentary foot pedal
 // * use LEDs in those buttons to show which mode is currently active
