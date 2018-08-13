@@ -60,11 +60,12 @@ uint32_t startplaying;
 
 void setup() {
 
-  pinMode(RunLEDPin, OUTPUT);
+  pinMode(RunLEDPin, OUTPUT); // set up the LED pins
   pinMode(DemoLEDPin, OUTPUT);
   pinMode(ReadyLEDPin, OUTPUT);
   pinMode(StopLEDPin, OUTPUT);
-  digitalWrite(RunLEDPin, LOW);
+  
+  digitalWrite(RunLEDPin, LOW); // prob unnecessary but anyway!
   digitalWrite(DemoLEDPin, LOW);
   digitalWrite(StopLEDPin, LOW);
   digitalWrite(ReadyLEDPin, LOW);
@@ -90,7 +91,7 @@ void setup() {
   Serial.println("SD OK!");
 
   // Set volume for left, right channels. lower numbers == louder volume!
-  musicPlayer.setVolume(1, 1);
+  musicPlayer.setVolume(1, 1); //this is loud!
 
   // This option uses a pin interrupt. No timers required! But DREQ
   // must be on an interrupt pin. For Uno/Duemilanove/Diecimilla
@@ -98,17 +99,15 @@ void setup() {
   if (! musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT))
     Serial.println(F("DREQ pin is not an interrupt pin"));
 
-
-
-
-
+// this are adafruit music maker pins
   musicPlayer.GPIO_pinMode(RunButtonPin, INPUT);
   musicPlayer.GPIO_pinMode(DemoButtonPin, INPUT);
   musicPlayer.GPIO_pinMode(StopButtonPin, INPUT);
   musicPlayer.GPIO_pinMode(ReadyButtonPin, INPUT);
   musicPlayer.GPIO_pinMode(PedalPin, INPUT);
 
-
+// this bit just looks cool if you put the LEDs in the order stop,demo,ready,run 
+  // it has no actual function.
   for (uint8_t f = 0; f < 3; f++) {
     digitalWrite(RunLEDPin, HIGH);
     delay(100);
@@ -139,13 +138,13 @@ void setup() {
   delay(100);
   digitalWrite(DemoLEDPin, LOW);
   digitalWrite(StopLEDPin, HIGH);
+  // end of cool but useless bit
 
   // set initial LED state
   digitalWrite(RunLEDPin, RunLEDState);
   digitalWrite(DemoLEDPin, DemoLEDState);
   digitalWrite(StopLEDPin, StopLEDState);
   digitalWrite(ReadyLEDPin, ReadyLEDState);
-
 }
 
 void loop() {
@@ -189,26 +188,23 @@ void loop() {
       RunButtonState = RunReading;
 
       // only toggle the LED if the new button state is HIGH
-      if (RunButtonState == HIGH) {
+      if (RunButtonState == HIGH) { // if run button is pressed
 
-
-        if (RunLEDState == LOW) {
-          musicPlayer.stopPlaying();
-          musicPlayer.startPlayingFile("music.mp3");
+        if (RunLEDState == LOW) { // if it was not in run mode already
+          musicPlayer.stopPlaying(); //stop playing first in case it was in demo mode
+          musicPlayer.startPlayingFile("music.mp3"); // play the run music
           startplaying = millis();
           StopLEDState = LOW;
           RunLEDState = HIGH;
           ReadyLEDState = LOW;
           DemoLEDState = LOW;
-
         }
-        else
+        else  //if it was in run mode already then go to stop and stop the music playing
         {
           StopLEDState = HIGH;
           RunLEDState = LOW;
           ReadyLEDState = LOW;
           DemoLEDState = LOW;
-
           musicPlayer.stopPlaying();
         }
       }
@@ -219,35 +215,32 @@ void loop() {
       PedalState = PedalReading;
 
       // only toggle the LED if the new button state is HIGH
-      if (PedalState == HIGH) {
+      if (PedalState == HIGH) { // if pedal is pressed
 
 
-        if (RunLEDState == LOW) {
-          musicPlayer.stopPlaying();
-          musicPlayer.startPlayingFile("music.mp3");
+        if (RunLEDState == LOW) { // if it was not in run mode already
+          musicPlayer.stopPlaying();  // stop playing first in case it was in demo mode
+          musicPlayer.startPlayingFile("music.mp3");  // play the run music
           startplaying = millis();
           StopLEDState = LOW;
           RunLEDState = HIGH;
           ReadyLEDState = LOW;
           DemoLEDState = LOW;
-
         }
-
+        // there is no "else" here. You could add code to make the pedal stop run mode but it has been taken out
+        // in case someone stands on it by accident. Use the buttons instead!
       }
     }
-
-
-
 
     if (DemoReading != DemoButtonState) {
       DemoButtonState = DemoReading;
 
       // only toggle the LED if the new button state is HIGH
-      if (DemoButtonState == HIGH) {
+      if (DemoButtonState == HIGH) { // if the demo button is pressed.
 
-        if (DemoLEDState == LOW) {
-          musicPlayer.stopPlaying();
-          musicPlayer.startPlayingFile("demo.mp3");
+        if (DemoLEDState == LOW) {  //if it was not in demo mode already.
+          musicPlayer.stopPlaying();  //stop playing first 
+          musicPlayer.startPlayingFile("demo.mp3");  // play the demo music
           startplaying = millis();
           StopLEDState = LOW;
           RunLEDState = LOW;
@@ -255,36 +248,32 @@ void loop() {
           DemoLEDState = HIGH;
 
         }
-        else
+        else  // if it was already in demo mode then stop music and go into stop mode
         {
           StopLEDState = HIGH;
           RunLEDState = LOW;
           ReadyLEDState = LOW;
           DemoLEDState = LOW;
-
           musicPlayer.stopPlaying();
         }
       }
     }
-
 
     if (ReadyReading != ReadyButtonState) {
       ReadyButtonState = ReadyReading;
 
       // only toggle the LED if the new button state is HIGH
-      if (ReadyButtonState == HIGH) {
-
-
-        if (ReadyLEDState == LOW) {
-          musicPlayer.stopPlaying();
-
+      if (ReadyButtonState == HIGH) {  // if the ready button is pressed
+        
+        if (ReadyLEDState == LOW) { // if it was not in ready mode already
+          musicPlayer.stopPlaying(); //stop the music in case it was playing
           StopLEDState = LOW;
           RunLEDState = LOW;
-          ReadyLEDState = HIGH;
+          ReadyLEDState = HIGH;  // go into ready mode
           DemoLEDState = LOW;
 
         }
-        else
+        else // go into stop mode if it was already in ready mode
         {
           StopLEDState = HIGH;
           RunLEDState = LOW;
@@ -294,21 +283,15 @@ void loop() {
         }
       }
     }
-
-
-
-
-
-
 
     if (StopReading != StopButtonState) {
       StopButtonState = StopReading;
 
 
       // only toggle the LED if the new button state is HIGH
-      if (StopButtonState == HIGH) {
+      if (StopButtonState == HIGH) { //if the stop button is pressed
 
-        if (StopLEDState == LOW) {
+        if (StopLEDState == LOW) {  // if it is not already in stop mode then do it.
           StopLEDState = HIGH;
           RunLEDState = LOW;
           ReadyLEDState = LOW;
@@ -317,14 +300,13 @@ void loop() {
           musicPlayer.stopPlaying();
           Serial.println("STOP going from low to high");
         }
+        // no else here!
       }
     }
-
-
   }
 
 
-  if  (musicPlayer.playingMusic) {
+  if  (musicPlayer.playingMusic) { // if it is playing music store it in this variable
     Playing = HIGH;
   }
   else
@@ -332,14 +314,15 @@ void loop() {
     Playing = LOW;
   }
 
-  if (LastPlaying > Playing && (RunLEDState == HIGH || DemoLEDState == HIGH)) {
-
+  if (LastPlaying > Playing && (RunLEDState == HIGH || DemoLEDState == HIGH)) { // if it has just stopped playing music on this cycle through the loop
+  // them put it into stop mode
     StopLEDState = HIGH;
     RunLEDState = LOW;
     ReadyLEDState = LOW;
     DemoLEDState = LOW;
   }
 
+  // send data to the LCD
   if  (RunLEDState) {
     lcd.setCursor(0, 0);
     lcd.print("RUNNING       ");
@@ -372,9 +355,5 @@ void loop() {
   // save the reading.  Next time through the loop,
   // it'll be the LastDebounce
   LastDebounce = Debounce;
-  LastPlaying = Playing;
+  LastPlaying = Playing;  //remember for the next time through the loop whether it was playing this time or not
 }
-
-
-
-
