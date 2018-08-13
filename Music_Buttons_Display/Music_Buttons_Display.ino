@@ -1,6 +1,12 @@
 // This code is designed to run on an Arduino Uno in the ground station
-// It is connected to an Adafruit Music Maker https://www.adafruit.com/product/1790
-// an LCD display and another UNO with MSGEQ7 spectrum analyser.
+// Its main functions are to:
+// * Control Adafruit Music Maker https://www.adafruit.com/product/1790
+// * Output its current status to a 16x2 LCD
+// * take input from 4 momentary buttons and a momentary foot pedal
+// * use LEDs in those buttons to show which mode is currently active
+// (I have used these momentary buttons https://www.adafruit.com/?q=16mm%20momentary%20illuminated&p=1)
+// * the same wires that go to the LEDs also connect to another arduino which is transmitting a signal to the heli
+
 
 // include SPI, MP3, SD and LiquidCrystal libraries
 #include <SPI.h>
