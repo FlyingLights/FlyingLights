@@ -29,7 +29,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 // THIS DATA STRUCURE MATCHES THE ONE ON THE RECEIVER
 struct dataStruct {
   uint8_t mode;
-  uint8_t millisec[4];
+  uint8_t millisec[3];
   uint8_t spectrum[7];
 } myData;
 
@@ -67,7 +67,7 @@ void loop()
 
   if (digitalRead(RunPin)) { //IF IT IS RUNNING
     myData.mode = 1;                    //RUN IS 1
-    if (millisec == 2000000000) { //IF IT HAS BEEN STOPPED
+    if (millisec == 15000000) { //IF IT HAS BEEN STOPPED
       startmillis = millis();  //RESTART THE TIMER TO NOW
     }
 
@@ -82,21 +82,21 @@ void loop()
   }
   else if (digitalRead(ReadyPin)) {
     myData.mode = 2;                    //READY IS 2
-    millisec = 2000000000;  // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
+    millisec = 15000000;  // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = 0  ;
     }
   }
   else if (digitalRead(DemoPin)) {
     myData.mode = 4;                    //DEMO IS 4
-    millisec = 2000000000; // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
+    millisec = 15000000; // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = f * 30 ;   // not actually useful just something I was testing!
     }
   }
   else {
     myData.mode = 3;                    //STOP IS 3
-    millisec = 2000000000; // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
+    millisec = 15000000; // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = 0 ;
     }
@@ -108,7 +108,7 @@ void loop()
   myData.millisec[0] = millisec;
   myData.millisec[1] = millisec >> 8;
   myData.millisec[2] = millisec >> 16;
-  myData.millisec[3] = millisec >> 24;
+
 
 
 
