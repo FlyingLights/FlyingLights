@@ -77,12 +77,12 @@ CRGB tstrip[TTOTALPIXELS]; //setup the array for the tail leds
 //this is the data structure for the info that comes over the radio
 struct dataStruct {
   uint8_t mode;  //mode 1=run,2=ready,3=stop,4=demo
-  uint8_t millisec[4]; //millisecond timer is split up into 4 bytes
+  uint8_t millisec[3]; //millisecond timer is split up into 4 bytes
   uint8_t spectrum[7]; //spectrum analyser over seven channels
 } radio;
 
 // radiomillis is the millisecond signal being sent over the radio. It is used
-// during run mode but set to 2000000000 when in other modes
+// during run mode but set to 15000000 when in other modes
 uint32_t radiomillis;
 
 // used to put a bright spot on the top of the spectrumtop function bars
@@ -489,7 +489,7 @@ void RadioCheck()  // this is used to check the LORA radio for incoming data
     {
       Serial.println("recv failed");
     }
-    radiomillis = radio.millisec[3] << 24 | (uint32_t)radio.millisec[2] << 16 | (uint32_t)radio.millisec[1] << 8 | (uint32_t)radio.millisec[0];
+    radiomillis = (uint32_t)radio.millisec[2] << 16 | (uint32_t)radio.millisec[1] << 8 | (uint32_t)radio.millisec[0];
   }
 }
 
@@ -639,7 +639,7 @@ void Show()
 
 void Finish()  // when this is reached it will hold until another mode is selected
 {
-  while (radiomillis < 1999999999)
+  while (radiomillis < 14999999)
   {
     RadioCheck();
     printout();
@@ -1070,7 +1070,7 @@ uint8_t tracker;
     FastLED.show();
     //fade
     nscale8(cstrip, CTOTALPIXELS, fade);
-
+    printout();
     RadioCheck();
   }
 }
