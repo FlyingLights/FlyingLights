@@ -3,6 +3,7 @@
 
 #include <SPI.h>
 #include <RH_RF95.h>
+#include <RHDatagram.h>
 
 // MSGEQ7 SETUP 
 #include "MSGEQ7.h"
@@ -20,11 +21,18 @@ CMSGEQ7<MSGEQ7_SMOOTH, pinReset, pinStrobe, pinAnalogLeft, pinAnalogRight> MSGEQ
 #define RFM95_RST 2
 #define RFM95_INT 3
 
+// THIS IS MY UNIQUE ADDRESS AND IT MUST MATCH THE ADDRESS IN THE TRANSMITTER
+// PLEASE CHANGE THIS FROM 43 AS THAT IS WHAT HAMISH IS USING!
+#define UNIQUE_ADDRESS 43
+
+#define TRANSMITTER_ADDRESS 42
+
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 433.0
 
 //INITIALISE RADIO
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
+RHDatagram manager(rf95,TRANSMITTER_ADDRESS);
 
 // THIS DATA STRUCURE MATCHES THE ONE ON THE RECEIVER
 struct dataStruct {
@@ -109,14 +117,11 @@ void loop()
   myData.millisec[1] = millisec >> 8;
   myData.millisec[2] = millisec >> 16;
 
-
-
-
   memcpy (tx_buf, &myData, sizeof(myData));
   byte zize = sizeof(myData);
   Serial.println("Sending to rf95_server");
 
-  rf95.send((uint8_t *)tx_buf, zize); //send the data
+  manager.sendto((uint8_t *)tx_buf, zize,UNIQUE_ADDRESS); //send the data
 
   rf95.waitPacketSent(); // wait until it is sent
 

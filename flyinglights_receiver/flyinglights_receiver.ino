@@ -7,12 +7,16 @@
 // setup for 433mhz lora radio
 #include <SPI.h> //include SPI library
 #include <RH_RF95.h> //include radiohead library
-// setup the correct pins
+
+// setup the correct pins feather board/LORA connection
 #define RFM95_CS 8
 #define RFM95_RST 4
 #define RFM95_INT 3
-// Define the operating frequency   **** you only need to change the line below to use a different frequency
-#define RF95_FREQ 433.0
+
+// THIS IS MY UNIQUE ADDRESS AND IT MUST MATCH THE ADDRESS IN THE TRANSMITTER
+// PLEASE CHANGE THIS FROM 43 AS THAT IS WHAT HAMISH IS USING!
+#define UNIQUE_ADDRESS 43
+
 //initialise the radio
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
@@ -122,7 +126,9 @@ uint8_t rightmax[7];
 void setup()
 {
 
-
+// set the address of this receiver
+  rf95.setThisAddress(UNIQUE_ADDRESS);  
+  
   //setup the FastLED strips with the correct led type, pin and array reference
   FastLED.addLeds<WS2812, CPIN, GRB>(cstrip, CTOTALPIXELS);
   FastLED.addLeds<WS2812, TPIN, GRB>(tstrip, TTOTALPIXELS);
