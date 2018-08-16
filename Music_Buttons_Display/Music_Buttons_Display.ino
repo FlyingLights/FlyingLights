@@ -71,7 +71,7 @@ void setup() {
   pinMode(DemoLEDPin, OUTPUT);
   pinMode(ReadyLEDPin, OUTPUT);
   pinMode(StopLEDPin, OUTPUT);
-  
+
   digitalWrite(RunLEDPin, LOW); // prob unnecessary but anyway!
   digitalWrite(DemoLEDPin, LOW);
   digitalWrite(StopLEDPin, LOW);
@@ -106,16 +106,16 @@ void setup() {
   if (! musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT))
     Serial.println(F("DREQ pin is not an interrupt pin"));
 
-// this are adafruit music maker pins
+  // this are adafruit music maker pins
   musicPlayer.GPIO_pinMode(RunButtonPin, INPUT);
   musicPlayer.GPIO_pinMode(DemoButtonPin, INPUT);
   musicPlayer.GPIO_pinMode(StopButtonPin, INPUT);
   musicPlayer.GPIO_pinMode(ReadyButtonPin, INPUT);
   musicPlayer.GPIO_pinMode(PedalPin, INPUT);
 
-// this bit just looks cool if you put the LEDs in the order stop,demo,ready,run 
+  // this bit just looks cool if you put the LEDs in the order stop,demo,ready,run
   // it has no actual function.
-  for (uint8_t f = 0; f < 3; f++) {
+  for (uint8_t f = 0; f < 2; f++) {
     digitalWrite(RunLEDPin, HIGH);
     delay(100);
     digitalWrite(RunLEDPin, LOW);
@@ -134,6 +134,10 @@ void setup() {
     digitalWrite(ReadyLEDPin, HIGH);
     delay(100);
     digitalWrite(ReadyLEDPin, LOW);
+    digitalWrite(RunLEDPin, HIGH);
+    delay(100);
+    digitalWrite(RunLEDPin, LOW);
+    delay(100);
   }
   digitalWrite(RunLEDPin, HIGH);
   delay(100);
@@ -246,7 +250,7 @@ void loop() {
       if (DemoButtonState == HIGH) { // if the demo button is pressed.
 
         if (DemoLEDState == LOW) {  //if it was not in demo mode already.
-          musicPlayer.stopPlaying();  //stop playing first 
+          musicPlayer.stopPlaying();  //stop playing first
           musicPlayer.startPlayingFile("demo.mp3");  // play the demo music
           startplaying = millis();
           StopLEDState = LOW;
@@ -271,7 +275,7 @@ void loop() {
 
       // only toggle the LED if the new button state is HIGH
       if (ReadyButtonState == HIGH) {  // if the ready button is pressed
-        
+
         if (ReadyLEDState == LOW) { // if it was not in ready mode already
           musicPlayer.stopPlaying(); //stop the music in case it was playing
           StopLEDState = LOW;
@@ -322,7 +326,7 @@ void loop() {
   }
 
   if (LastPlaying > Playing && (RunLEDState == HIGH || DemoLEDState == HIGH)) { // if it has just stopped playing music on this cycle through the loop
-  // them put it into stop mode
+    // them put it into stop mode
     StopLEDState = HIGH;
     RunLEDState = LOW;
     ReadyLEDState = LOW;
