@@ -27,9 +27,6 @@ CMSGEQ7<MSGEQ7_SMOOTH, pinReset, pinStrobe, pinAnalogLeft, pinAnalogRight> MSGEQ
 
 #define TRANSMITTER_ADDRESS 42
 
-// Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 433.0
-
 //INITIALISE RADIO
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 RHDatagram manager(rf95,TRANSMITTER_ADDRESS);
