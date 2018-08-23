@@ -965,7 +965,7 @@ void loop()
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/_new
+      // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
       
       ColourAll(BLACK);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
