@@ -176,334 +176,6 @@ void setup()
     Serial.println("init failed");
 }
 
-void loop()
-{
-
-  RadioCheck(); //get the data from the radio
-  Printout(); //serial.print just for debugging
-
-  switch (radio.mode) { // go different ways depending on the current radio mode
-
-    case 1: //run mode when radio.mode=1
-
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // THIS IS WHERE THE CODE GOES THAT RUNS THE NIGHT FLYING ROUTINE /////////////////////////////////////////////////////
-      // ONLY USE FUNCTIONS IN HERE FOR CLARITY /////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      // ***********  SPECIAL FUNCTIONS THAT CAN BE USED: ***********
-
-      // 1. Show();
-      // This shows the pre-selected static colours on the canopy.
-      // Not needed with dynamic functions.
-
-      // 2. WaitUntil(TIME_IN_MILLISECONDS);
-      // This function waits *unitl* TIME_IN_MILLISECONDS is reached.
-
-      // 3. Finish();
-      // This is almost always placed at the end of the routine.
-      // It waits here until another mode is selected. Without it
-      // the run routine will repeat again.
-
-      // ***********  STATIC FUNCTIONS THAT CAN BE USED: ***********
-
-      // * STATIC COLOUR FUNCTIONS
-
-      // 1. ColourCanopy (COLOUR);
-      // This fills the canopy with a 24 bit RGB colour.
-      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 2. ColourTail (COLOUR);
-      // This fills the whole tail with a 24 bit RGB colour.
-      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 3. ColourSkids (COLOUR);
-      // This fills the whole skids with a 24 bit RGB colour.
-      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 4. ColourTailBoom (COLOUR);
-      // This fills the tail boom with a 24 bit RGB colour.
-      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 5. ColourTailFin (COLOUR);
-      // This fills the tail fin with a 24 bit RGB colour.
-      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 6. ColourSkidsUnder (COLOUR);
-      // This fills the tail boom with a 24 bit RGB colour.
-      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 7. ColourSkidsSide (COLOUR);
-      // This fills the side of the skids with a 24 bit RGB colour.
-      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 8. ColourAll (COLOUR);
-      // This fills the whole heli with a 24 bit RGB colour.
-      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
-
-      // * STATIC HUE FUNCTIONS
-
-      // 1. HueCanopy (HUE);
-      // This fills the canopy with a rainbow hue from 0-255.
-      // Can use hues such as HUE_YELLOW but not colours such as WHITE
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 2. HueTail (HUE);
-      // This fills the tail with a rainbow hue from 0-255.
-      // Can use hues such as HUE_YELLOW but not colours such as WHITE
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 3. HueSkids (HUE);
-      // This fills the whole skids with a rainbow hue from 0-255.
-      // Can use hues such as HUE_YELLOW but not colours such as WHITE
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 4. HueTailBoom (HUE);
-      // This fills the tail boom with a rainbow hue from 0-255.
-      // Can use hues such as HUE_YELLOW but not colours such as WHITE
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 5. HueTailFin (HUE);
-      // This fills the tail fin with a rainbow hue from 0-255.
-      // Can use hues such as HUE_YELLOW but not colours such as WHITE
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 6. HueSkidsUnder (HUE);
-      // This fills the tail boom with a rainbow hue from 0-255.
-      // Can use hues such as HUE_YELLOW but not colours such as WHITE
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 7. HueSkidsSide (HUE);
-      // This fills the side of the skids with a rainbow hue from 0-255.
-      // Can use hues such as HUE_YELLOW but not colours such as WHITE
-      // Note it does not show the colour until SHOW(); function is called.
-
-      // 8. HueAll (HUE);
-      // This fills the whole heli with a rainbow hue from 0-255.
-      // Can use hues such as HUE_YELLOW but not colours such as WHITE
-
-      // ***********  DYNAMIC "UNTIL" FUNCTIONS THAT CAN BE USED: ***********
-
-      // * COLOUR "UNTIL" FUNCTIONS
-
-      // 1. ColourMergeAllUntil(TIME_IN_MILLISECONDS, COLOUR_1, COLOUR_2);
-
-      // This fills the heli with COLOUR_1 which merges to COLOUR_2.
-      // Runs until TIME_IN_MILLIDECONDS is reached.
-
-      // 2. ColourOneSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
-
-      // This sparkles the whole heli with one colour (COLOUR_1).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-      // Runs until TIME_IN_MILLISECONDS is reached
-
-      // 3. ColourOneSparkleCanopyTailBoomUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
-
-      // This sparkles the canopy and tail boom with one colour (COLOUR_1).
-      // ALSO KEEPS THE TAIL FIN THAT SOLID COLOUR TO STOP IT FADING
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-      // Runs until TIME_IN_MILLISECONDS is reached
-
-      // 4. ColourMergeAllSparklingCanopyTailBoomUntil (TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, START_COLOUR, END_COLOUR, FADE_SPEED)
-      // This sparkles the canopy and tail boom with the rest of the heli solid colour.
-      // The colour merges from COLOUR_1 to COLOUR_2.
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100 and is just for canopy and tail boom.
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-      // Runs until TIME_IN_MILLISECONDS is reached
-
-
-      // * HUE "UNTIL" FUNCTIONS
-
-      // 1. HueTwoSparkleCanopyUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
-
-      // This sparkles the canopy with two hues (HUE_1 and HUE_2).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-      // Runs until TIME_IN_MILLISECONDS is reached
-      // tail and skids do not change from previously set colours
-
-      // 2. HueTwoSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
-
-      // This sparkles the whole heli with two hues (HUE_1 and HUE_2).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-      // Runs until TIME_IN_MILLISECONDS is reached
-
-      // 3. HueOneSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, FADE_SPEED)
-
-      // This sparkles the whole heli with one hue (HUE_1).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-      // Runs until TIME_IN_MILLISECONDS is reached
-
-      // 4. HueMergeAllUntil(TIME_IN_MILLISECONDS, HUE_1, HUE_2);
-
-      // This fills the heli with HUE_1 which merges to HUE_2.
-      // Runs until TIME_IN_MILLISECONDS is reached.
-
-
-
-
-      ColourAll(BLACK);
-      WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
-      ColourMergeAllSparklingCanopyTailBoomUntil (19279, 0.3, BLACK, WHITE, 200);
-      ColourSkids(WHITE);
-      ColourTailFin(WHITE);
-      ColourOneSparkleCanopyTailBoomUntil(19365, 0.3, WHITE, 200); //up to chord change
-      ColourOneSparkleCanopyTailBoomUntil(21942, 1, WHITE, 200); //up to "we're marooned on a small island"
-      ColourMergeAllSparklingCanopyTailBoomUntil (23225, 1, WHITE, GREEN, 200); //merge through to "island" at 23225
-      ColourOneSparkleCanopyTailBoomUntil(25066, 1, GREEN, 200); //up to "in an endless"
-      ColourMergeAllSparklingCanopyTailBoomUntil (26342, 1, GREEN, BLUE, 200); //merge through to "sea" at 26342
-      ColourOneSparkleCanopyTailBoomUntil(28532, 1, BLUE, 200); //up to a point where it starts merging to yellow
-      ColourMergeAllSparklingCanopyTailBoomUntil(29164, 1, BLUE, YELLOW, 200); //merged as it gets to sand
-      ColourOneSparkleCanopyTailBoomUntil(32322, 1, YELLOW, 200); //up to dramatic
-      ColourMergeAllUntil(32722, BLACK, RED); //up to "but tonight"
-      Starlights(38452, RED, 200, 5);
-      ColourSkids(CYAN);
-      Starlights(41723, CYAN, 200, 5);
-      ColourSkids(GREEN);
-      Starlights(47554, GREEN, 200, 5);
-      ColourSkids(RED);
-      ColourTailFin(RED);
-      ColourMergeAllUntil(48054, BLACK, ORANGE); //this is the start of whaa
-      WaitUntil(52616);
-      ColourSkids(ORANGE);
-  
-
-      //      ColourCanopy (DULLGREEN);
-      //      ColourTailBoom (DULLPINK);
-      //      ColourTailFin (DULLRED);
-      //      ColourSkidsSide (DULLBLUE);
-      //      ColourSkidsUnder (DULLCYAN);
-      //      Show();
-      //      WaitUntil(5000);
-      //
-      //      HueCanopy (HUE_BLUE);
-      //      ColourTailBoom(DULLMAGENTA);
-      //      ColourTailFin (DULLBLUE);
-      //      ColourSkidsSide (DULLORANGE);
-      //      ColourSkidsUnder (DULLGREEN);
-      //      Show();
-      //      WaitUntil(10000);
-      //
-      //      ColourMergeAllUntil(12000, DULLPINK, GREEN);
-      //      ColourMergeAllUntil(16000, BLACK, CYAN);
-      //      ColourMergeAllUntil(19000, DULLRED, DULLYELLOW);
-      //      ColourMergeAllUntil(23000, GREY, GREEN);
-      //
-      //      ColourCanopy (DULLORANGE);
-      //      ColourTailBoom (DULLBLUE);
-      //      ColourTailFin (DULLPINK);
-      //      ColourSkidsSide (DULLGREEN);
-      //      ColourSkidsUnder (DULLRED);
-
-      ColourAll(BLACK);
-      Show();
-
-      Finish();
-
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // END OF THE NIGHT FLYING ROUTINE ////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      break; // end of run mode
-
-    case 2:  //ready mode when radio.mode=2
-
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // READY MODE IS GENERALLY USED WHEN THE HELI IS WAITING TO START ROUTINE /////////////////////////////////////////////
-      // CAN USE STATIC COLOURS OR DYNAMIC PATTERNS BUT NOT "UNTIL" FUNCTIONS   /////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      // *********** FUNCTIONS FOR READY AND DEMO MODES  ***********
-
-      // 1. HueTwoSparkleCanopy(PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
-
-      // This sparkles the canopy with two hues (HUE_1 and HUE_2).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-      // tail and skids do not change from previously set colours
-
-      // 2. HueTwoSparkleAll(PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
-
-      // This sparkles the whole heli with two hues (HUE_1 and HUE_2).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-
-      // 3. HueOneSparkleAll(PERCENT_OF_PIXELS_ON, HUE_1, FADE_SPEED)
-
-      // This sparkles the whole heli with one hue (HUE_1).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-
-      // 4. ColourOneSparkleAll(PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
-
-      // This sparkles the whole heli with one colour (COLOUR_1).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-
-      // 5. ColourOneSparkleCanopyTailBoom(PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
-
-      // This sparkles the canopy and tail boom with one colour (COLOUR_1).
-      // ALSO KEEPS THE TAIL FIN THAT SOLID COLOUR TO STOP IT FADING
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-
-
-      HueTwoSparkleAll( 0.8, m, n, 200);
-      ColourTail(BLACK);
-      ColourSkids (BLACK);
-
-      if (m % 10 == 0) {
-        n += 1;
-      }
-      m += 1;
-
-      break; // end of ready mode
-
-    case 3:  // stop mode when radio.mode=3
-
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // STOP MODE IS GENERALLY USED TO SWITCH OFF ALL LEDS /////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      ColourAll (BLACK);
-      Show();
-      break; // end of stop mode
-
-    case 4:   // demo mode when radio.mode=4
-
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // DEMO MODE //////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // CAN USE STATIC COLOURS OR DYNAMIC PATTERNS BUT NOT "UNTIL" FUNCTIONS   /////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      ColourAll (DULLGREY);
-      Show();
-      break; // end of demo mode
-
-  } // end of switch case
-} // end of loop
-
 void RadioCheck()  // this is used to check the LORA radio for incoming data
 // it must be included in all "until" functions
 {
@@ -1106,9 +778,6 @@ void SpectrumTop(uint32_t until, uint32_t colour1, uint32_t colour2, uint8_t fad
   }
 }
 
-
-
-
 void Starlights(uint32_t until, uint32_t colour, uint8_t fade, uint8_t wait) {
 
   while (radiomillis < until)
@@ -1190,6 +859,335 @@ void ReverseStarlights(uint32_t until, uint32_t colour, uint8_t fade, uint8_t wa
   }
 
 }
+
+void loop()
+{
+
+  RadioCheck(); //get the data from the radio
+  Printout(); //serial.print just for debugging
+
+  switch (radio.mode) { // go different ways depending on the current radio mode
+
+    case 2:  //ready mode when radio.mode=2
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // READY MODE IS GENERALLY USED WHEN THE HELI IS WAITING TO START ROUTINE /////////////////////////////////////////////
+      // CAN USE STATIC COLOURS OR DYNAMIC PATTERNS BUT NOT "UNTIL" FUNCTIONS   /////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      // *********** FUNCTIONS FOR READY AND DEMO MODES  ***********
+
+      // 1. HueTwoSparkleCanopy(PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
+
+      // This sparkles the canopy with two hues (HUE_1 and HUE_2).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // tail and skids do not change from previously set colours
+
+      // 2. HueTwoSparkleAll(PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
+
+      // This sparkles the whole heli with two hues (HUE_1 and HUE_2).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
+      // 3. HueOneSparkleAll(PERCENT_OF_PIXELS_ON, HUE_1, FADE_SPEED)
+
+      // This sparkles the whole heli with one hue (HUE_1).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
+      // 4. ColourOneSparkleAll(PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
+
+      // This sparkles the whole heli with one colour (COLOUR_1).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
+      // 5. ColourOneSparkleCanopyTailBoom(PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
+
+      // This sparkles the canopy and tail boom with one colour (COLOUR_1).
+      // ALSO KEEPS THE TAIL FIN THAT SOLID COLOUR TO STOP IT FADING
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+
+
+      HueTwoSparkleAll( 0.8, m, n, 200);
+      ColourTail(BLACK);
+      ColourSkids (BLACK);
+
+      if (m % 10 == 0) {
+        n += 1;
+      }
+      m += 1;
+
+      break; // end of ready mode
+
+    case 3:  // stop mode when radio.mode=3
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // STOP MODE IS GENERALLY USED TO SWITCH OFF ALL LEDS /////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      ColourAll (BLACK);
+      Show();
+      break; // end of stop mode
+
+    case 4:   // demo mode when radio.mode=4
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // DEMO MODE //////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // CAN USE STATIC COLOURS OR DYNAMIC PATTERNS BUT NOT "UNTIL" FUNCTIONS   /////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      ColourAll (DULLGREY);
+      Show();
+      break; // end of demo mode
+
+    case 1: //run mode when radio.mode=1
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // THIS IS WHERE THE CODE GOES THAT RUNS THE NIGHT FLYING ROUTINE /////////////////////////////////////////////////////
+      // ONLY USE FUNCTIONS IN HERE FOR CLARITY /////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      // ***********  SPECIAL FUNCTIONS THAT CAN BE USED: ***********
+
+      // 1. Show();
+      // This shows the pre-selected static colours on the canopy.
+      // Not needed with dynamic functions.
+
+      // 2. WaitUntil(TIME_IN_MILLISECONDS);
+      // This function waits *unitl* TIME_IN_MILLISECONDS is reached.
+
+      // 3. Finish();
+      // This is almost always placed at the end of the routine.
+      // It waits here until another mode is selected. Without it
+      // the run routine will repeat again.
+
+      // ***********  STATIC FUNCTIONS THAT CAN BE USED: ***********
+
+      // * STATIC COLOUR FUNCTIONS
+
+      // 1. ColourCanopy (COLOUR);
+      // This fills the canopy with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 2. ColourTail (COLOUR);
+      // This fills the whole tail with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 3. ColourSkids (COLOUR);
+      // This fills the whole skids with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 4. ColourTailBoom (COLOUR);
+      // This fills the tail boom with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 5. ColourTailFin (COLOUR);
+      // This fills the tail fin with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 6. ColourSkidsUnder (COLOUR);
+      // This fills the tail boom with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 7. ColourSkidsSide (COLOUR);
+      // This fills the side of the skids with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 8. ColourAll (COLOUR);
+      // This fills the whole heli with a 24 bit RGB colour.
+      // Can use predifined colours such as DULLGREEN but not hues such as HUE_AQUA
+
+      // * STATIC HUE FUNCTIONS
+
+      // 1. HueCanopy (HUE);
+      // This fills the canopy with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 2. HueTail (HUE);
+      // This fills the tail with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 3. HueSkids (HUE);
+      // This fills the whole skids with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 4. HueTailBoom (HUE);
+      // This fills the tail boom with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 5. HueTailFin (HUE);
+      // This fills the tail fin with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 6. HueSkidsUnder (HUE);
+      // This fills the tail boom with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 7. HueSkidsSide (HUE);
+      // This fills the side of the skids with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+      // Note it does not show the colour until SHOW(); function is called.
+
+      // 8. HueAll (HUE);
+      // This fills the whole heli with a rainbow hue from 0-255.
+      // Can use hues such as HUE_YELLOW but not colours such as WHITE
+
+      // ***********  DYNAMIC "UNTIL" FUNCTIONS THAT CAN BE USED: ***********
+
+      // * COLOUR "UNTIL" FUNCTIONS
+
+      // 1. ColourMergeAllUntil(TIME_IN_MILLISECONDS, COLOUR_1, COLOUR_2);
+
+      // This fills the heli with COLOUR_1 which merges to COLOUR_2.
+      // Runs until TIME_IN_MILLIDECONDS is reached.
+
+      // 2. ColourOneSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
+
+      // This sparkles the whole heli with one colour (COLOUR_1).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+      // 3. ColourOneSparkleCanopyTailBoomUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
+
+      // This sparkles the canopy and tail boom with one colour (COLOUR_1).
+      // ALSO KEEPS THE TAIL FIN THAT SOLID COLOUR TO STOP IT FADING
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+      // 4. ColourMergeAllSparklingCanopyTailBoomUntil (TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, START_COLOUR, END_COLOUR, FADE_SPEED)
+      // This sparkles the canopy and tail boom with the rest of the heli solid colour.
+      // The colour merges from COLOUR_1 to COLOUR_2.
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100 and is just for canopy and tail boom.
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+
+      // * HUE "UNTIL" FUNCTIONS
+
+      // 1. HueTwoSparkleCanopyUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
+
+      // This sparkles the canopy with two hues (HUE_1 and HUE_2).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+      // tail and skids do not change from previously set colours
+
+      // 2. HueTwoSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
+
+      // This sparkles the whole heli with two hues (HUE_1 and HUE_2).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+      // 3. HueOneSparkleAllUntil(TIME_IN_MILLISECONDS, PERCENT_OF_PIXELS_ON, HUE_1, FADE_SPEED)
+
+      // This sparkles the whole heli with one hue (HUE_1).
+      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
+      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
+      // Runs until TIME_IN_MILLISECONDS is reached
+
+      // 4. HueMergeAllUntil(TIME_IN_MILLISECONDS, HUE_1, HUE_2);
+
+      // This fills the heli with HUE_1 which merges to HUE_2.
+      // Runs until TIME_IN_MILLISECONDS is reached.
+
+
+
+
+      ColourAll(BLACK);
+      WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
+      ColourMergeAllSparklingCanopyTailBoomUntil (19279, 0.3, BLACK, WHITE, 200);
+      ColourSkids(WHITE);
+      ColourTailFin(WHITE);
+      ColourOneSparkleCanopyTailBoomUntil(19365, 0.3, WHITE, 200); //up to chord change
+      ColourOneSparkleCanopyTailBoomUntil(21942, 1, WHITE, 200); //up to "we're marooned on a small island"
+      ColourMergeAllSparklingCanopyTailBoomUntil (23225, 1, WHITE, GREEN, 200); //merge through to "island" at 23225
+      ColourOneSparkleCanopyTailBoomUntil(25066, 1, GREEN, 200); //up to "in an endless"
+      ColourMergeAllSparklingCanopyTailBoomUntil (26342, 1, GREEN, BLUE, 200); //merge through to "sea" at 26342
+      ColourOneSparkleCanopyTailBoomUntil(28532, 1, BLUE, 200); //up to a point where it starts merging to yellow
+      ColourMergeAllSparklingCanopyTailBoomUntil(29164, 1, BLUE, YELLOW, 200); //merged as it gets to sand
+      ColourOneSparkleCanopyTailBoomUntil(32322, 1, YELLOW, 200); //up to dramatic
+      ColourMergeAllUntil(32722, BLACK, RED); //up to "but tonight"
+      Starlights(38452, RED, 200, 5);
+      ColourSkids(CYAN);
+      Starlights(41723, CYAN, 200, 5);
+      ColourSkids(GREEN);
+      Starlights(47554, GREEN, 200, 5);
+      ColourSkids(RED);
+      ColourTailFin(RED);
+      ColourMergeAllUntil(48054, BLACK, ORANGE); //this is the start of whaa
+      WaitUntil(52616);
+      ColourSkids(ORANGE);
+  
+
+      //      ColourCanopy (DULLGREEN);
+      //      ColourTailBoom (DULLPINK);
+      //      ColourTailFin (DULLRED);
+      //      ColourSkidsSide (DULLBLUE);
+      //      ColourSkidsUnder (DULLCYAN);
+      //      Show();
+      //      WaitUntil(5000);
+      //
+      //      HueCanopy (HUE_BLUE);
+      //      ColourTailBoom(DULLMAGENTA);
+      //      ColourTailFin (DULLBLUE);
+      //      ColourSkidsSide (DULLORANGE);
+      //      ColourSkidsUnder (DULLGREEN);
+      //      Show();
+      //      WaitUntil(10000);
+      //
+      //      ColourMergeAllUntil(12000, DULLPINK, GREEN);
+      //      ColourMergeAllUntil(16000, BLACK, CYAN);
+      //      ColourMergeAllUntil(19000, DULLRED, DULLYELLOW);
+      //      ColourMergeAllUntil(23000, GREY, GREEN);
+      //
+      //      ColourCanopy (DULLORANGE);
+      //      ColourTailBoom (DULLBLUE);
+      //      ColourTailFin (DULLPINK);
+      //      ColourSkidsSide (DULLGREEN);
+      //      ColourSkidsUnder (DULLRED);
+
+      ColourAll(BLACK);
+      Show();
+
+      Finish();
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // END OF THE NIGHT FLYING ROUTINE ////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      break; // end of run mode
+
+
+  } // end of switch case
+} // end of loop
 
 
 
