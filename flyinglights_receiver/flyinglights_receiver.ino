@@ -93,7 +93,12 @@ uint32_t radiomillis;
 uint8_t leftspectrumtop[7];
 uint8_t rightspectrumtop[7];
 
-// this defines the LED matrix on the canopy. The numbers are the addresses of the LEDs in rows from FRONT to BACK, starting at the bottom and working up
+// This variable is used for the starlights function. One variable for each row.
+uint8_t starlights[ROWS];
+
+
+
+// this defines the LED matrix on the LEFT canopy. The numbers are the addresses of the LEDs in rows from FRONT to BACK, running from TOP to BOTTOM
 // 999 refers to an LED that is not present
 uint16_t leftcanopy [][37] = {
   {999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 336, 337, 338, 339, 340, 341, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999},
@@ -106,6 +111,8 @@ uint16_t leftcanopy [][37] = {
   {999, 999, 999, 999, 34, 33, 32, 999, 6, 5, 4, 3, 2, 1, 0, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999},
 };
 
+// this defines the LED matrix on the RIGHT canopy. The numbers are the addresses of the LEDs in rows from FRONT to BACK, running from TOP to BOTTOM
+// 999 refers to an LED that is not present
 uint16_t rightcanopy [][37] = {
   {999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 335, 334, 333, 332, 331, 330, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999},
   {999, 999, 999, 999, 999, 999, 999, 999, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 999, 999, 999, 999, 999, 999, 999, 999},
@@ -126,9 +133,15 @@ uint8_t rightmax[7];
 void setup()
 {
 
-// set the address of this receiver
-  rf95.setThisAddress(UNIQUE_ADDRESS);  
-  
+  //PUT THE VALUE OF COLUMNS INTO EACH OF STARLIGHTS
+  for (uint8_t f = 0; f < ROWS; f++)
+  {
+    starlights[f] = COLUMNS;
+  }
+
+  // set the unique address of this receiver
+  rf95.setThisAddress(UNIQUE_ADDRESS);
+
   //setup the FastLED strips with the correct led type, pin and array reference
   FastLED.addLeds<WS2812, CPIN, GRB>(cstrip, CTOTALPIXELS);
   FastLED.addLeds<WS2812, TPIN, GRB>(tstrip, TTOTALPIXELS);
@@ -143,21 +156,21 @@ void setup()
   {
     for (uint8_t g = 0; g < COLUMNS; g++)
     {
-      if (leftcanopy[f+1][g] < 999) {
+      if (leftcanopy[f + 1][g] < 999) {
         leftmax[f] = g;
       }
-      if (rightcanopy[f+1][g] < 999) {
+      if (rightcanopy[f + 1][g] < 999) {
         rightmax[f] = g;
       }
     }
 
     Serial.print(f);
     Serial.print(" leftmax:");
-        Serial.print(leftmax[f]);
-            Serial.print(" rightmax:");
-        Serial.println(rightmax[f]);
+    Serial.print(leftmax[f]);
+    Serial.print(" rightmax:");
+    Serial.println(rightmax[f]);
   }
-  
+
 
   if (!rf95.init())
     Serial.println("init failed");
@@ -167,7 +180,7 @@ void loop()
 {
 
   RadioCheck(); //get the data from the radio
-  printout(); //serial.print just for debugging
+  Printout(); //serial.print just for debugging
 
   switch (radio.mode) { // go different ways depending on the current radio mode
 
@@ -338,8 +351,10 @@ void loop()
 
       // This fills the heli with HUE_1 which merges to HUE_2.
       // Runs until TIME_IN_MILLISECONDS is reached.
-      
-      SpectrumTop(900000, DULLCYAN, RED, 100);
+
+
+
+
       ColourAll(BLACK);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
       ColourMergeAllSparklingCanopyTailBoomUntil (19279, 0.3, BLACK, WHITE, 200);
@@ -354,7 +369,17 @@ void loop()
       ColourMergeAllSparklingCanopyTailBoomUntil(29164, 1, BLUE, YELLOW, 200); //merged as it gets to sand
       ColourOneSparkleCanopyTailBoomUntil(32322, 1, YELLOW, 200); //up to dramatic
       ColourMergeAllUntil(32722, BLACK, RED); //up to "but tonight"
-
+      Starlights(38452, RED, 200, 5);
+      ColourSkids(CYAN);
+      Starlights(41723, CYAN, 200, 5);
+      ColourSkids(GREEN);
+      Starlights(47554, GREEN, 200, 5);
+      ColourSkids(RED);
+      ColourTailFin(RED);
+      ColourMergeAllUntil(48054, BLACK, ORANGE); //this is the start of whaa
+      WaitUntil(52616);
+      ColourSkids(ORANGE);
+  
 
       //      ColourCanopy (DULLGREEN);
       //      ColourTailBoom (DULLPINK);
@@ -499,7 +524,7 @@ void RadioCheck()  // this is used to check the LORA radio for incoming data
   }
 }
 
-void printout() // just for serial debugging
+void Printout() // just for serial debugging
 {
 
   Serial.print(radio.mode);
@@ -554,7 +579,7 @@ void WaitUntil(uint32_t waituntil) // just wait until a certain number of millis
   while (radiomillis < waituntil)
   {
     RadioCheck();
-    printout();
+    Printout();
   }
 }
 
@@ -648,7 +673,7 @@ void Finish()  // when this is reached it will hold until another mode is select
   while (radiomillis < 14999999)
   {
     RadioCheck();
-    printout();
+    Printout();
   }
 
 }
@@ -1013,12 +1038,12 @@ void Spectrum(uint32_t until, uint32_t colour, uint8_t fade) {
 
 void SpectrumTop(uint32_t until, uint32_t colour1, uint32_t colour2, uint8_t fade) {
 
-uint8_t tracker;
+  uint8_t tracker;
   while (radiomillis < until)
   {
-    tracker+= 1;
-    if (tracker==3) {
-      tracker=0;
+    tracker += 1;
+    if (tracker == 3) {
+      tracker = 0;
     }
     //run down the rows and channels
     for (uint16_t i = 0; i < 7; i++) {
@@ -1031,12 +1056,12 @@ uint8_t tracker;
         cstrip[(rightcanopy [i + 1][j])] = colour1;
       }
 
-      
+
       // put the right top on
       if ( rightspectrumtop[i] < j)
       {
         if (j > rightmax[i]) {
-        rightspectrumtop[i] = rightmax[i];
+          rightspectrumtop[i] = rightmax[i];
         }
         else
         {
@@ -1045,18 +1070,18 @@ uint8_t tracker;
       }
       else
       {
-        if (rightspectrumtop[i] > 0 && tracker==0) {
+        if (rightspectrumtop[i] > 0 && tracker == 0) {
           rightspectrumtop[i] -= 1;
         }
       }
 
       cstrip[(rightcanopy [i + 1][rightspectrumtop[i]])] = colour2;
 
-// put the left top on it
+      // put the left top on it
       if ( leftspectrumtop[i] < j)
       {
         if (j > leftmax[i]) {
-        leftspectrumtop[i] = leftmax[i];
+          leftspectrumtop[i] = leftmax[i];
         }
         else
         {
@@ -1065,7 +1090,7 @@ uint8_t tracker;
       }
       else
       {
-        if (leftspectrumtop[i] > 0 && tracker==0) {
+        if (leftspectrumtop[i] > 0 && tracker == 0) {
           leftspectrumtop[i] -= 1;
         }
       }
@@ -1076,8 +1101,96 @@ uint8_t tracker;
     FastLED.show();
     //fade
     nscale8(cstrip, CTOTALPIXELS, fade);
-    printout();
+    Printout();
     RadioCheck();
   }
 }
+
+
+
+
+void Starlights(uint32_t until, uint32_t colour, uint8_t fade, uint8_t wait) {
+
+  while (radiomillis < until)
+  {
+    for (uint8_t f = 0; f < ROWS; f++) {
+
+      if  (starlights[f] == COLUMNS)
+      {
+        if (random(1, 10) == 1)
+        {
+          starlights[f] = 0;
+        }
+      }
+
+      else
+      {
+        cstrip[(leftcanopy [f][starlights[f]])] = colour;
+        cstrip[(rightcanopy [f][starlights[f]])] = colour;
+
+        starlights[f]++;
+
+      }
+    }
+
+    // show the pixels
+    FastLED.show();
+    //fade
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    //slow it down a bit
+    delay(wait);
+    //check the radio
+    RadioCheck();
+
+  }
+
+}
+
+
+void ReverseStarlights(uint32_t until, uint32_t colour, uint8_t fade, uint8_t wait) {
+
+  while (radiomillis < until)
+  {
+    for (uint8_t f = 0; f < ROWS; f++) {
+
+      if  (starlights[f] == COLUMNS)
+      {
+        if (random(1, 10) == 1)
+        {
+          starlights[f] = COLUMNS - 1;
+        }
+      }
+
+      else
+
+      {
+        cstrip[(leftcanopy [f][starlights[f]])] = colour;
+        cstrip[(rightcanopy [f][starlights[f]])] = colour;
+
+        if (starlights[f] > 0)
+        {
+          starlights[f]--;
+        }
+        else
+        {
+          starlights[f] = COLUMNS;
+
+        }
+      }
+    }
+
+    // show the pixels
+    FastLED.show();
+    //fade
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    //slow it down a bit
+    delay(wait);
+    //check the radio
+    RadioCheck();
+  }
+
+}
+
+
+
 
