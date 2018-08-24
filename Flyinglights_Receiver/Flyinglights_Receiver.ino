@@ -165,6 +165,9 @@ uint8_t m; //just a handy reusable 8bit unsigned integer!
 uint8_t leftmax[7];
 uint8_t rightmax[7];
 
+// this is a variable that triggers the functions to only run through once in demo & ready modes
+bool runthrough;
+
 void setup()
 {
 
@@ -350,170 +353,203 @@ void Finish()  // when this is reached it will hold until another mode is select
 
 }
 
-void TwoSparkleCanopy(float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
+
+
+//void SparkleCanopyTailBoom(float howmany1, CRGB colour1, uint8_t fade)
+//{
+//
+//  howmany1 *= 100;
+//
+//  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+//    if (random16(10000) < howmany1) {
+//      cstrip[j] = colour1;
+//    }
+//  }
+//
+//  for (uint16_t j = BOOMFRONT; j <= BOOMREAR; j++) {
+//    if (random16(10000) < howmany1) {
+//      tstrip[j] = colour1;
+//    }
+//  }
+//
+//  TailFin(colour1);  // bug
+//
+//  FastLED.show();
+//
+//  nscale8(cstrip, CTOTALPIXELS, fade);
+//  nscale8(tstrip, TTOTALPIXELS, fade);
+//
+//}
+//
+
+
+
+void SparkleCanopyTailBoom(uint32_t waituntil, float howmany1, CRGB colour1, uint8_t fade)
 {
 
   howmany1 *= 100;
+  while (radiomillis < waituntil || runthrough)
+  {
 
-  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      if (random8() < 128) {
-        cstrip[j]=colour1;
-      }
-      else
-      {
-        cstrip[j]=colour2;
-      }
-    }
-  }
 
-  FastLED.show();
-
-  nscale8(cstrip, CTOTALPIXELS, fade);
-
-}
-
-void SparkleCanopyTailBoom(float howmany1, CRGB colour1, uint8_t fade)
-{
-
-  howmany1 *= 100;
-
-  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      cstrip[j] = colour1;
-    }
-  }
-
-  for (uint16_t j = BOOMFRONT; j <= BOOMREAR; j++) {
-    if (random16(10000) < howmany1) {
-      tstrip[j] = colour1;
-    }
-  }
-
-  TailFin(colour1);  // bug
-
-  FastLED.show();
-
-  nscale8(cstrip, CTOTALPIXELS, fade);
-  nscale8(tstrip, TTOTALPIXELS, fade);
-
-}
-
-void SparkleAll(float howmany1, CRGB colour1, uint8_t fade)
-{
-
-  howmany1 *= 100;
-
-  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      cstrip[j] = colour1;
-    }
-  }
-
-  for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      tstrip[j] = colour1;
-    }
-  }
-
-  for (uint16_t j = 0; j < STOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      sstrip[j] = colour1;
-    }
-  }
-
-  FastLED.show();
-
-  nscale8(cstrip, CTOTALPIXELS, fade);
-  nscale8(tstrip, TTOTALPIXELS, fade);
-  nscale8(sstrip, STOTALPIXELS, fade);
-
-}
-
-void TwoSparkleAll(float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
-{
-
-  howmany1 *= 100;
-
-  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      if (random8() < 128) {
+    for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
         cstrip[j] = colour1;
       }
-      else
-      {
-        cstrip[j] = colour2;
-      }
     }
-  }
 
-  for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      if (random8() < 128) {
+    for (uint16_t j = BOOMFRONT; j <= BOOMREAR; j++) {
+      if (random16(10000) < howmany1) {
         tstrip[j] = colour1;
       }
-      else
-      {
-        tstrip[j] = colour2;
-      }
+    }
+
+    TailFin(colour1);  // bug
+
+    FastLED.show();
+
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    nscale8(tstrip, TTOTALPIXELS, fade);
+
+    RadioCheck();
+    if (runthrough) {
+      break;
     }
 
   }
+}
 
-  for (uint16_t j = 0; j < STOTALPIXELS; j++) {
+void SparkleAll(uint32_t waituntil, float howmany1, CRGB colour1, uint8_t fade)
+{
 
-    if (random16(10000) < howmany1) {
-      if (random8() < 128) {
+  howmany1 *= 100;
+  while (radiomillis < waituntil || runthrough)
+  {
+
+    for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        cstrip[j] = colour1;
+      }
+    }
+
+    for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        tstrip[j] = colour1;
+      }
+    }
+
+    for (uint16_t j = 0; j < STOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
         sstrip[j] = colour1;
       }
-      else
-      {
-        sstrip[j] = colour2;
-      }
+    }
+
+    FastLED.show();
+
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    nscale8(tstrip, TTOTALPIXELS, fade);
+    nscale8(sstrip, STOTALPIXELS, fade);
+
+    RadioCheck();
+    if (runthrough) {
+      break;
     }
   }
-
-  FastLED.show();
-
-  nscale8(cstrip, CTOTALPIXELS, fade);
-  nscale8(tstrip, TTOTALPIXELS, fade);
-  nscale8(sstrip, STOTALPIXELS, fade);
-
 }
 
-void SparkleCanopyTailBoomUntil(uint32_t waituntil, float howmany1, CRGB colour1, uint8_t fade)
+
+void TwoSparkleAll(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
 {
-  while (radiomillis < waituntil)
+
+  howmany1 *= 100;
+  while (radiomillis < waituntil || runthrough)
   {
+
+
+    for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        if (random8() < 128) {
+          cstrip[j] = colour1;
+        }
+        else
+        {
+          cstrip[j] = colour2;
+        }
+      }
+    }
+
+    for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        if (random8() < 128) {
+          tstrip[j] = colour1;
+        }
+        else
+        {
+          tstrip[j] = colour2;
+        }
+      }
+
+    }
+
+    for (uint16_t j = 0; j < STOTALPIXELS; j++) {
+
+      if (random16(10000) < howmany1) {
+        if (random8() < 128) {
+          sstrip[j] = colour1;
+        }
+        else
+        {
+          sstrip[j] = colour2;
+        }
+      }
+    }
+
+    FastLED.show();
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    nscale8(tstrip, TTOTALPIXELS, fade);
+    nscale8(sstrip, STOTALPIXELS, fade);
+
     RadioCheck();
-    SparkleCanopyTailBoom(howmany1, colour1, fade);
+
+    if (runthrough) {
+      break;
+    }
   }
 }
 
-void SparkleAllUntil(uint32_t waituntil, float howmany1, CRGB colour1, uint8_t fade)
-{
-  while (radiomillis < waituntil)
-  {
-    RadioCheck();
-    SparkleAll(howmany1, colour1, fade);
-  }
-}
 
 
-void TwoSparkleAllUntil(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
+
+
+void TwoSparkleCanopy(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
 {
-  while (radiomillis < waituntil)
+
+  howmany1 *= 100;
+  while (radiomillis < waituntil || runthrough)
   {
+
+
+    for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        if (random8() < 128) {
+          cstrip[j] = colour1;
+        }
+        else
+        {
+          cstrip[j] = colour2;
+        }
+      }
+    }
+
+    FastLED.show();
+
+    nscale8(cstrip, CTOTALPIXELS, fade);
+
     RadioCheck();
-    TwoSparkleAll(howmany1, colour1, colour2, fade);
-  }
-}
-void TwoSparkleCanopyUntil(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
-{
-  while (radiomillis < waituntil)
-  {
-    RadioCheck();
-    TwoSparkleCanopy(howmany1, colour1, colour2, fade);
+
+    if (runthrough) {
+      break;
+    }
   }
 }
 
@@ -533,12 +569,14 @@ void MergeAll (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from
     uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
 
     CRGB newcolour = startcolour.lerp8(endcolour, fraction);
-    
+
     Canopy(newcolour);
     Skids(newcolour);
     Tail(newcolour);
     Show();
     RadioCheck();
+
+
   }
 
 }
@@ -588,7 +626,7 @@ void SparkleMerge1 (uint32_t until, float howmany1, CRGB startcolour, CRGB endco
 // Spectrum analyser function for the canopy
 void Spectrum(uint32_t until, uint32_t colour, uint8_t fade) {
 
-  while (radiomillis < until)
+  while (radiomillis < until || runthrough)
   {
     //run down the rows and channels
     for (uint16_t i = 0; i < 7; i++) {
@@ -606,13 +644,16 @@ void Spectrum(uint32_t until, uint32_t colour, uint8_t fade) {
     nscale8(cstrip, CTOTALPIXELS, fade);
 
     RadioCheck();
+    if (runthrough) {
+      break;
+    }
   }
 }
 
 // Spectrum analyser function for the canopy
 void SpectrumTwoColour(uint32_t until, CRGB colour1, CRGB colour2) {
 
-  while (radiomillis < until)
+  while (radiomillis < until || runthrough)
   {
     Canopy(colour2);
 
@@ -629,13 +670,16 @@ void SpectrumTwoColour(uint32_t until, CRGB colour1, CRGB colour2) {
     // show the pixels
     FastLED.show();
     RadioCheck();
+    if (runthrough) {
+      break;
+    }
   }
 }
 
 void SpectrumTop(uint32_t until, CRGB colour1, CRGB colour2, uint8_t fade) {
 
   uint8_t tracker;
-  while (radiomillis < until)
+  while (radiomillis < until || runthrough)
   {
     tracker += 1;
     if (tracker == 3) {
@@ -697,14 +741,18 @@ void SpectrumTop(uint32_t until, CRGB colour1, CRGB colour2, uint8_t fade) {
     FastLED.show();
     //fade
     nscale8(cstrip, CTOTALPIXELS, fade);
-    Printout();
+
     RadioCheck();
+
+    if (runthrough) {
+      break;
+    }
   }
 }
 
 void Starlights(uint32_t until, CRGB colour, uint8_t fade, uint8_t wait) {
 
-  while (radiomillis < until)
+  while (radiomillis < until || runthrough)
   {
     for (uint8_t f = 0; f < ROWS; f++) {
 
@@ -734,6 +782,9 @@ void Starlights(uint32_t until, CRGB colour, uint8_t fade, uint8_t wait) {
     delay(wait);
     //check the radio
     RadioCheck();
+    if (runthrough) {
+      break;
+    }
 
   }
 
@@ -741,7 +792,7 @@ void Starlights(uint32_t until, CRGB colour, uint8_t fade, uint8_t wait) {
 
 void ReverseStarlights(uint32_t until, CRGB colour, uint8_t fade, uint8_t wait) {
 
-  while (radiomillis < until)
+  while (radiomillis < until || runthrough)
   {
     for (uint8_t f = 0; f < ROWS; f++) {
 
@@ -779,6 +830,9 @@ void ReverseStarlights(uint32_t until, CRGB colour, uint8_t fade, uint8_t wait) 
     delay(wait);
     //check the radio
     RadioCheck();
+    if (runthrough) {
+      break;
+    }
   }
 
 }
@@ -792,7 +846,7 @@ void loop()
   switch (radio.mode) { // go different ways depending on the current radio mode
 
     case 2:  //ready mode when radio.mode=2
-
+      runthrough = true;
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // READY MODE IS GENERALLY USED WHEN THE HELI IS WAITING TO START ROUTINE /////////////////////////////////////////////
@@ -835,7 +889,10 @@ void loop()
       // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
 
 
-      TwoSparkleAll( 0.8, CHSV(m, 255, 255), CHSV(n, 255, 255), 200);
+      //TwoSparkleAll(0, 0.8, CHSV(m, 255, 255), CHSV(n, 255, 255), 200);
+
+      SparkleAll(0, 0.8, CHSV(n, 255, 255), 200);
+
       Tail(black);
       Skids (black);
 
@@ -847,7 +904,7 @@ void loop()
       break; // end of ready mode
 
     case 3:  // stop mode when radio.mode=3
-
+      runthrough = true;
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // STOP MODE IS GENERALLY USED TO SWITCH OFF ALL LEDS /////////////////////////////////////////////////////////////////
@@ -859,7 +916,7 @@ void loop()
       break; // end of stop mode
 
     case 4:   // demo mode when radio.mode=4
-
+      runthrough = true;
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // DEMO MODE //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -872,7 +929,7 @@ void loop()
       break; // end of demo mode
 
     case 1: //run mode when radio.mode=1
-
+      runthrough = false;
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // THIS IS WHERE THE CODE GOES THAT RUNS THE NIGHT FLYING ROUTINE /////////////////////////////////////////////////////
@@ -882,20 +939,20 @@ void loop()
       // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
 
 
-
+      SparkleAll(7000, 0.3,  cyan, 50);
       All(black);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
       SparkleMerge1 (19279, 0.3, black, white, 200);
       Skids(white);
       TailFin(white);
-      SparkleCanopyTailBoomUntil(19365, 0.3, white, 200); //up to chord change
-      SparkleCanopyTailBoomUntil(21942, 1, white, 200); //up to "we're marooned on a small island"
+      SparkleCanopyTailBoom(19365, 0.3, white, 200); //up to chord change
+      SparkleCanopyTailBoom(21942, 1, white, 200); //up to "we're marooned on a small island"
       SparkleMerge1 (23225, 1, white, green, 200); //merge through to "island" at 23225
-      SparkleCanopyTailBoomUntil(25066, 1, green, 200); //up to "in an endless"
+      SparkleCanopyTailBoom(25066, 1, green, 200); //up to "in an endless"
       SparkleMerge1 (26342, 1, green, blue, 200); //merge through to "sea" at 26342
-      SparkleCanopyTailBoomUntil(28532, 1, blue, 200); //up to a point where it starts merging to yellow
+      SparkleCanopyTailBoom(28532, 1, blue, 200); //up to a point where it starts merging to yellow
       SparkleMerge1(29164, 1, blue, yellow, 200); //merged as it gets to sand
-      SparkleCanopyTailBoomUntil(32322, 1, yellow, 200); //up to dramatic
+      SparkleCanopyTailBoom(32322, 1, yellow, 200); //up to dramatic
       MergeAll(32722, black, red); //up to "but tonight"
       WaitUntil(35573);
       Starlights(38452, red, 200, 5);
