@@ -1,4 +1,3 @@
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CUSTOMISE THE LINES BELOW TO MATCH YOUR SETUP ///////////////////////////////////////////////////////////////////////
@@ -850,43 +849,9 @@ void loop()
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // READY MODE IS GENERALLY USED WHEN THE HELI IS WAITING TO START ROUTINE /////////////////////////////////////////////
-      // CAN USE STATIC COLOURS OR DYNAMIC PATTERNS BUT NOT "UNTIL" FUNCTIONS   /////////////////////////////////////////////
+      // CAN USE MOST FUNCTIONS BUT NOT "MERGE" FUNCTIONS   /////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      // *********** FUNCTIONS FOR READY AND DEMO MODES  ***********
-
-      // 1. HueTwoSparkleCanopy(PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
-
-      // This sparkles the canopy with two hues (HUE_1 and HUE_2).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-      // tail and skids do not change from previously set colours
-
-      // 2. HueTwoSparkleAll(PERCENT_OF_PIXELS_ON, HUE_1, HUE_2, FADE_SPEED)
-
-      // This sparkles the whole heli with two hues (HUE_1 and HUE_2).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-
-      // 3. HueSparkleAll(PERCENT_OF_PIXELS_ON, HUE_1, FADE_SPEED)
-
-      // This sparkles the whole heli with one hue (HUE_1).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-
-      // 4. ColourSparkleAll(PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
-
-      // This sparkles the whole heli with one colour (COLOUR_1).
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
-
-      // 5. ColourSparkleCanopyTailBoom(PERCENT_OF_PIXELS_ON, COLOUR_1, FADE_SPEED)
-
-      // This sparkles the canopy and tail boom with one colour (COLOUR_1).
-      // ALSO KEEPS THE TAIL FIN THAT SOLID COLOUR TO STOP IT FADING
-      // PERCENT_OF_PIXELS_ON can be from 0.01 to 100
-      // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
 
 
       //TwoSparkleAll(0, 0.8, CHSV(m, 255, 255), CHSV(n, 255, 255), 200);
@@ -939,7 +904,7 @@ void loop()
       // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
 
 
-      SparkleAll(7000, 0.3,  cyan, 50);
+ //     SparkleAll(7000, 0.3,  cyan, 50);
       All(black);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
       SparkleMerge1 (19279, 0.3, black, white, 200);
