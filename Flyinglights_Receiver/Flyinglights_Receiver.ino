@@ -1,9 +1,9 @@
 
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // CUSTOMISE THE LINES BELOW TO MATCH YOUR SETUP ///////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CUSTOMISE THE LINES BELOW TO MATCH YOUR SETUP ///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // for the three lines below it can be worth setting one more
 // than the actual number of pixels if the last pixel is behaving oddly
@@ -54,11 +54,11 @@ uint16_t rightcanopy [][37] = {
   {999, 999, 999, 29, 30, 31, 999, 7, 8, 9, 10, 11, 12, 13, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999},
 };
 
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // END OF CUSTOM SETUP ////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// END OF CUSTOM SETUP ////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // This code is written to run on a Feather M0 LORA 433Mhz
 // https://www.adafruit.com/product/3179
@@ -587,15 +587,6 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
   // until = The radiomillis when this colour merge ends
   // startcolour = The starting RGB colour
   // endcolour = The ending RGB colour
-
-  uint8_t rr = startcolour >> 16; //dismantle the colour into RGB components
-  uint8_t gg = startcolour >> 8;
-  uint8_t bb = startcolour;
-
-  uint8_t r = endcolour >> 16; //dismantle the colour into RGB components
-  uint8_t g = endcolour >> 8;
-  uint8_t b = endcolour;
-
   RadioCheck();
   uint32_t starttime = radiomillis;
   uint32_t totalduration = until - radiomillis;
@@ -604,21 +595,29 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
   {
     uint32_t elapsed = radiomillis - starttime;
     uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
-    uint8_t rrr = lerp8by8(rr, r, fraction); //interpolate between rr & r
-    uint8_t ggg = lerp8by8(gg, g, fraction);
-    uint8_t bbb = lerp8by8(bb, b, fraction);
-    uint32_t colour = (uint32_t)rrr << 16 | (uint32_t)ggg << 8 | (uint32_t)bbb; //put the colour back together as 24bit RGB colour
-    ColourCanopy(colour);
-    ColourSkids(colour);
-    ColourTail(colour);
+
+    CRGB newcolour = CRGB(startcolour).lerp8(CRGB (endcolour), fraction);
+
+    Serial.println(newcolour);
+    //fill the canopy
+    fill_solid( &(cstrip[0]), CTOTALPIXELS , newcolour );
+    //fill the skids
+    fill_solid( &(sstrip[0]), STOTALPIXELS , newcolour );
+    //fill the tail
+    fill_solid( &(tstrip[0]), TTOTALPIXELS , newcolour );
+
+
     Show();
     RadioCheck();
   }
 
 }
 
+
 void HueMergeAllUntil (uint32_t until, uint8_t starthue, uint32_t endhue) { // merge from one solid hue to another on canopy, tail and skids
 
+  CRGB startcolour = CHSV(starthue, 255, 255);
+  CRGB endcolour = CHSV(endhue, 255, 255);
   // until = The radiomillis when this colour merge ends
   // starthue = The starting 8 bit hue
   // endhue = The ending 8 bit hue
@@ -631,16 +630,24 @@ void HueMergeAllUntil (uint32_t until, uint8_t starthue, uint32_t endhue) { // m
   {
     uint32_t elapsed = radiomillis - starttime;
     uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
-    uint8_t huey = lerp8by8(starthue, endhue, fraction); //interpolate between starthue and endhue
 
-    HueCanopy(huey);
-    HueSkids(huey);
-    HueTail(huey);
+    CRGB newcolour = startcolour.lerp8(endcolour, fraction);
+
+    Serial.println(newcolour);
+    //fill the canopy
+    fill_solid( &(cstrip[0]), CTOTALPIXELS , newcolour );
+    //fill the skids
+    fill_solid( &(sstrip[0]), STOTALPIXELS , newcolour );
+    //fill the tail
+    fill_solid( &(tstrip[0]), TTOTALPIXELS , newcolour );
+
     Show();
     RadioCheck();
   }
 
 }
+
+
 
 void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1, uint32_t startcolour, uint32_t endcolour, uint8_t fade) { // merge from one colour to another, but with the canopy and tail boom sparkling
 
@@ -649,25 +656,6 @@ void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1,
   // endcolour = The ending RGB colour
 
   howmany1 *= 100;
-  /* this is what it is going to change to. To stop using a float.
-    uint16_t howmany;
-
-    if (howmany1>100) {
-    howmany=100;
-    }
-    else
-    {
-    howmany=howmany1*100;
-    }
-  */
-
-  uint8_t rr = startcolour >> 16; //dismantle the colour into RGB components
-  uint8_t gg = startcolour >> 8;
-  uint8_t bb = startcolour;
-
-  uint8_t r = endcolour >> 16; //dismantle the colour into RGB components
-  uint8_t g = endcolour >> 8;
-  uint8_t b = endcolour;
 
   RadioCheck();
   uint32_t starttime = radiomillis;
@@ -676,25 +664,27 @@ void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1,
   {
     uint32_t elapsed = radiomillis - starttime;
     uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
-    uint8_t rrr = lerp8by8(rr, r, fraction); //interpolate between rr & r
-    uint8_t ggg = lerp8by8(gg, g, fraction);
-    uint8_t bbb = lerp8by8(bb, b, fraction);
-    uint32_t colour = (uint32_t)rrr << 16 | (uint32_t)ggg << 8 | (uint32_t)bbb; //put the colour back together as 24bit RGB colour
+
+    CRGB newcolour = CRGB(startcolour).lerp8(CRGB(endcolour), fraction);
 
     for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
       if (random16(10000) < howmany1) {
-        cstrip[j] = colour;
+        cstrip[j] = newcolour;
+
       }
     }
 
     for (uint16_t j = BOOMFRONT; j <= BOOMREAR; j++) {
       if (random16(10000) < howmany1) {
-        tstrip[j] = colour;
+        tstrip[j] = newcolour;
       }
     }
+    //fill the skids
+    fill_solid( &(sstrip[0]), STOTALPIXELS , newcolour );
+    //fill the tailfin
+    fill_solid( &(tstrip[TAILFINFIRST]), TAILFINLAST - TAILFINFIRST + 1 , newcolour );
 
-    ColourTailFin(colour);   // bug
-    ColourSkids(colour);     // bug
+
     FastLED.show();
     nscale8(cstrip, CTOTALPIXELS, fade);
     nscale8(tstrip, TTOTALPIXELS, fade);
@@ -702,6 +692,7 @@ void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1,
   }
 
 }
+
 
 
 // Spectrum analyser function for the canopy
@@ -724,6 +715,29 @@ void Spectrum(uint32_t until, uint32_t colour, uint8_t fade) {
     //fade
     nscale8(cstrip, CTOTALPIXELS, fade);
 
+    RadioCheck();
+  }
+}
+
+// Spectrum analyser function for the canopy
+void SpectrumTwoColour(uint32_t until, uint32_t colour1, uint32_t colour2) {
+
+  while (radiomillis < until)
+  {
+    ColourCanopy(colour2);
+
+    //run down the rows and channels
+    for (uint16_t i = 0; i < 7; i++) {
+      // work out the WIDTH of the HORIZONTAL bars for each channel and put that in y
+      uint16_t  y = (COLUMNS * radio.spectrum[i]) >> 8; //multiply the radio.spectrum signal by the number of columns and divide by 256
+      // run ALONG the bar
+      for (uint16_t j = 0; j < y; j++) {
+        cstrip[(leftcanopy [i + 1][j])] = colour1;
+        cstrip[(rightcanopy [i + 1][j])] = colour1;
+      }
+    }
+    // show the pixels
+    FastLED.show();
     RadioCheck();
   }
 }
@@ -977,7 +991,10 @@ void loop()
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
-      
+
+      //    ColourMergeAllSparklingCanopyTailBoomUntil (5000, 1, RED, BLUE, 100);
+
+
       ColourAll(BLACK);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
       ColourMergeAllSparklingCanopyTailBoomUntil (19279, 0.3, BLACK, WHITE, 200);
@@ -992,16 +1009,26 @@ void loop()
       ColourMergeAllSparklingCanopyTailBoomUntil(29164, 1, BLUE, YELLOW, 200); //merged as it gets to sand
       ColourSparkleCanopyTailBoomUntil(32322, 1, YELLOW, 200); //up to dramatic
       ColourMergeAllUntil(32722, BLACK, RED); //up to "but tonight"
+      WaitUntil(35573);
       Starlights(38452, RED, 200, 5);
+      ColourTailFin(CYAN);
       ColourSkids(CYAN);
       Starlights(41723, CYAN, 200, 5);
+      ColourTailFin(GREEN);
       ColourSkids(GREEN);
       Starlights(47554, GREEN, 200, 5);
-      ColourSkids(RED);
-      ColourTailFin(RED);
       ColourMergeAllUntil(48054, BLACK, ORANGE); //this is the start of whaa
       WaitUntil(52616);
       ColourSkids(ORANGE);
+      ColourMergeAllSparklingCanopyTailBoomUntil(55279, 50, ORANGE, BLACK, 20); //Bam1 up to Bam2 orange to black 50% sparkling
+      WaitUntil(55379);
+      ColourMergeAllSparklingCanopyTailBoomUntil(58089, 50, GREEN, BLACK, 20); //Bam2 up to Bam3
+      WaitUntil(58189);
+      ColourMergeAllSparklingCanopyTailBoomUntil(60829, 50, CYAN, BLACK, 20); //Bam3 up to Bam4
+      WaitUntil(60929);
+      ColourMergeAllSparklingCanopyTailBoomUntil(63545, 50, YELLOW, BLACK, 20); //Ba4 up to Building up
+      WaitUntil(63645);
+
       ColourAll(BLACK);
       Finish();
 
