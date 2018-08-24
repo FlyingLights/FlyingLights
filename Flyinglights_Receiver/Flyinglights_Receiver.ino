@@ -110,6 +110,30 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 #define GREY 0x101010
 #define DULLGREY 0x060606
 
+
+const CRGB blue = CRGB( BLUE);
+const CRGB red = CRGB( RED);
+const CRGB green = CRGB( GREEN);
+const CRGB magenta = CRGB( MAGENTA);
+const CRGB cyan = CRGB( CYAN);
+const CRGB yellow = CRGB( YELLOW );
+const CRGB orange = CRGB( ORANGE );
+const CRGB pink = CRGB( PINK);
+const CRGB dullyellow = CRGB( DULLYELLOW);
+const CRGB dullred = CRGB( DULLRED);
+const CRGB dullgreen = CRGB( DULLGREEN);
+const CRGB dullcyan = CRGB( DULLCYAN);
+const CRGB dullmagenta = CRGB( DULLMAGENTA);
+const CRGB dullblue = CRGB( DULLBLUE);
+const CRGB dullorange = CRGB( DULLORANGE);
+const CRGB dullpink = CRGB( DULLPINK);
+const CRGB black = CRGB( BLACK);
+const CRGB white = CRGB( WHITE);
+const CRGB lightgrey = CRGB( LIGHTGREY);
+const CRGB grey = CRGB( GREY);
+const CRGB dullgrey = CRGB( DULLGREY);
+
+
 // prefined hue colours. These come from the FASTLED library
 //  HUE_RED = 0, HUE_ORANGE = 32, HUE_YELLOW = 64, HUE_GREEN = 96,
 //  HUE_AQUA = 128, HUE_BLUE = 160, HUE_PURPLE = 192, HUE_PINK = 224
@@ -267,91 +291,47 @@ void WaitUntil(uint32_t waituntil) // just wait until a certain number of millis
   }
 }
 
-void ColourCanopy(uint32_t colour) // set the whole canopy to a solid colour
+void Canopy(CRGB colour) // set the whole canopy to a solid colour
 {
   fill_solid( &(cstrip[0]), CTOTALPIXELS , colour );
 }
 
-void ColourTail(uint32_t colour)  // set the whole tail to a solid colour
+void Tail(CRGB colour)  // set the whole tail to a solid colour
 {
   fill_solid( &(tstrip[0]), TTOTALPIXELS , colour );
 }
 
-void ColourSkids(uint32_t colour)  // set the whole skids to a solid colour
+void Skids(CRGB colour)  // set the whole skids to a solid colour
 {
   fill_solid( &(sstrip[0]), STOTALPIXELS , colour );
 }
 
-void ColourAll(uint32_t colour) // set the whole heli to a solid colour
+void All(CRGB colour) // set the whole heli to a solid colour
 {
-  ColourCanopy(colour);
-  ColourTail(colour);
-  ColourSkids(colour);
+  Canopy(colour);
+  Tail(colour);
+  Skids(colour);
 }
 
-void ColourTailFin(uint32_t colour) // set the tail fin to a solid colour
+void TailFin(CRGB colour) // set the tail fin to a solid colour
 {
   fill_solid( &(tstrip[TAILFINFIRST]), TAILFINLAST - TAILFINFIRST + 1 , colour );
 }
 
-void ColourTailBoom(uint32_t colour) // set the tail boom to a solid colour
+void TailBoom(CRGB colour) // set the tail boom to a solid colour
 {
   fill_solid( &(tstrip[BOOMFRONT]), BOOMREAR - BOOMFRONT + 1 , colour );
 }
 
-void ColourSkidsSide(uint32_t colour)  // set the side of the skids to a solid colour
+void SkidsSide(CRGB colour)  // set the side of the skids to a solid colour
 {
   fill_solid( &(sstrip[SKIDSFIRST]), SKIDSLAST - SKIDSFIRST + 1 , colour );
 }
 
-void ColourSkidsUnder(uint32_t colour) // set the underside of the skids to a solic colour
+void SkidsUnder(CRGB colour) // set the underside of the skids to a solic colour
 {
   fill_solid( &(sstrip[UNDERFRONTFIRST]), UNDERFRONTLAST - UNDERFRONTFIRST + 1 , colour );
   fill_solid( &(sstrip[UNDERREARFIRST]), UNDERREARLAST - UNDERREARFIRST + 1 , colour );
-}
-
-
-void HueAll(uint8_t hue) // set the whole heli to a solid hue
-{
-  HueCanopy(hue);
-  HueTail(hue);
-  HueSkids(hue);
-}
-
-void HueCanopy(uint8_t hue)
-{
-  fill_solid( &(cstrip[0]), CTOTALPIXELS , CHSV( hue, 255, 255) );
-}
-
-void HueTail(uint8_t hue)
-{
-  fill_solid( &(tstrip[0]), TTOTALPIXELS , CHSV( hue, 255, 255) );
-}
-
-void HueSkids(uint8_t hue)
-{
-  fill_solid( &(sstrip[0]), STOTALPIXELS , CHSV( hue, 255, 255) );
-}
-
-void HueTailFin(uint8_t hue)
-{
-  fill_solid( &(tstrip[TAILFINFIRST]), TAILFINLAST - TAILFINFIRST + 1 , CHSV( hue, 255, 255) );
-}
-
-void HueTailBoom(uint8_t hue)
-{
-  fill_solid( &(tstrip[BOOMFRONT]), BOOMREAR - BOOMFRONT + 1 , CHSV( hue, 255, 255) );
-}
-
-void HueSkidsSide(uint8_t hue)
-{
-  fill_solid( &(sstrip[SKIDSFIRST]), SKIDSLAST - SKIDSFIRST + 1 , CHSV( hue, 255, 255) );
-}
-
-void HueSkidsUnder(uint8_t hue)
-{
-  fill_solid( &(sstrip[UNDERFRONTFIRST]), UNDERFRONTLAST - UNDERFRONTFIRST + 1 , CHSV( hue, 255, 255) );
-  fill_solid( &(sstrip[UNDERREARFIRST]), UNDERREARLAST - UNDERREARFIRST + 1 , CHSV( hue, 255, 255) );
 }
 
 void Show()
@@ -370,7 +350,7 @@ void Finish()  // when this is reached it will hold until another mode is select
 
 }
 
-void HueTwoSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
+void TwoSparkleCanopy(float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
 {
 
   howmany1 *= 100;
@@ -378,11 +358,11 @@ void HueTwoSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fad
   for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
     if (random16(10000) < howmany1) {
       if (random8() < 128) {
-        cstrip[j].setHue(hue1);
+        cstrip[j]=colour1;
       }
       else
       {
-        cstrip[j].setHue(hue2);
+        cstrip[j]=colour2;
       }
     }
   }
@@ -393,41 +373,7 @@ void HueTwoSparkleCanopy(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fad
 
 }
 
-void HueSparkleAll(float howmany1, uint8_t hue1, uint8_t fade)
-{
-
-  howmany1 *= 100;
-
-  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      cstrip[j].setHue(hue1);
-    }
-  }
-
-  for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      tstrip[j].setHue(hue1);
-    }
-  }
-
-
-  for (uint16_t j = 0; j < STOTALPIXELS; j++) {
-    if (random16(10000) < howmany1) {
-      sstrip[j].setHue(hue1);
-    }
-  }
-
-  FastLED.show();
-
-  nscale8(cstrip, CTOTALPIXELS, fade);
-  nscale8(tstrip, TTOTALPIXELS, fade);
-  nscale8(sstrip, STOTALPIXELS, fade);
-
-}
-
-
-
-void ColourSparkleCanopyTailBoom(float howmany1, uint32_t colour1, uint8_t fade)
+void SparkleCanopyTailBoom(float howmany1, CRGB colour1, uint8_t fade)
 {
 
   howmany1 *= 100;
@@ -444,18 +390,16 @@ void ColourSparkleCanopyTailBoom(float howmany1, uint32_t colour1, uint8_t fade)
     }
   }
 
-  ColourTailFin(colour1);  // bug
+  TailFin(colour1);  // bug
 
   FastLED.show();
 
   nscale8(cstrip, CTOTALPIXELS, fade);
   nscale8(tstrip, TTOTALPIXELS, fade);
 
-
 }
 
-
-void ColourSparkleAll(float howmany1, uint32_t colour1, uint8_t fade)
+void SparkleAll(float howmany1, CRGB colour1, uint8_t fade)
 {
 
   howmany1 *= 100;
@@ -486,7 +430,7 @@ void ColourSparkleAll(float howmany1, uint32_t colour1, uint8_t fade)
 
 }
 
-void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
+void TwoSparkleAll(float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
 {
 
   howmany1 *= 100;
@@ -494,11 +438,11 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
   for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
     if (random16(10000) < howmany1) {
       if (random8() < 128) {
-        cstrip[j].setHue(hue1);
+        cstrip[j] = colour1;
       }
       else
       {
-        cstrip[j].setHue(hue2);
+        cstrip[j] = colour2;
       }
     }
   }
@@ -506,11 +450,11 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
   for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
     if (random16(10000) < howmany1) {
       if (random8() < 128) {
-        tstrip[j].setHue(hue1);
+        tstrip[j] = colour1;
       }
       else
       {
-        tstrip[j].setHue(hue2);
+        tstrip[j] = colour2;
       }
     }
 
@@ -520,11 +464,11 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 
     if (random16(10000) < howmany1) {
       if (random8() < 128) {
-        sstrip[j].setHue(hue1);
+        sstrip[j] = colour1;
       }
       else
       {
-        sstrip[j].setHue(hue2);
+        sstrip[j] = colour2;
       }
     }
   }
@@ -537,52 +481,44 @@ void HueTwoSparkleAll(float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
 
 }
 
-void ColourSparkleCanopyTailBoomUntil(uint32_t waituntil, float howmany1, uint32_t colour1, uint8_t fade)
+void SparkleCanopyTailBoomUntil(uint32_t waituntil, float howmany1, CRGB colour1, uint8_t fade)
 {
   while (radiomillis < waituntil)
   {
     RadioCheck();
-    ColourSparkleCanopyTailBoom(howmany1, colour1, fade);
+    SparkleCanopyTailBoom(howmany1, colour1, fade);
   }
 }
 
-void ColourSparkleAllUntil(uint32_t waituntil, float howmany1, uint8_t colour1, uint8_t fade)
+void SparkleAllUntil(uint32_t waituntil, float howmany1, CRGB colour1, uint8_t fade)
 {
   while (radiomillis < waituntil)
   {
     RadioCheck();
-    ColourSparkleAll(howmany1, colour1, fade);
+    SparkleAll(howmany1, colour1, fade);
   }
 }
 
-void HueSparkleAllUntil(uint32_t waituntil, float howmany1, uint8_t hue1, uint8_t fade)
+
+void TwoSparkleAllUntil(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
 {
   while (radiomillis < waituntil)
   {
     RadioCheck();
-    HueSparkleAll(howmany1, hue1, fade);
+    TwoSparkleAll(howmany1, colour1, colour2, fade);
   }
 }
-
-void HueTwoSparkleAllUntil(uint32_t waituntil, float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
+void TwoSparkleCanopyUntil(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
 {
   while (radiomillis < waituntil)
   {
     RadioCheck();
-    HueTwoSparkleAll(howmany1, hue1, hue2, fade);
-  }
-}
-void HueTwoSparkleCanopyUntil(uint32_t waituntil, float howmany1, uint8_t hue1, uint8_t hue2, uint8_t fade)
-{
-  while (radiomillis < waituntil)
-  {
-    RadioCheck();
-    HueTwoSparkleCanopy(howmany1, hue1, hue2, fade);
+    TwoSparkleCanopy(howmany1, colour1, colour2, fade);
   }
 }
 
 
-void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolour) { // merge from one solid colour to another on canopy, tail and skids
+void Merge1 (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from one solid colour to another on canopy, tail and skids
 
   // until = The radiomillis when this colour merge ends
   // startcolour = The starting RGB colour
@@ -596,60 +532,18 @@ void ColourMergeAllUntil (uint32_t until, uint32_t startcolour, uint32_t endcolo
     uint32_t elapsed = radiomillis - starttime;
     uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
 
-    CRGB newcolour = CRGB(startcolour).lerp8(CRGB (endcolour), fraction);
-
-    Serial.println(newcolour);
-    //fill the canopy
-    fill_solid( &(cstrip[0]), CTOTALPIXELS , newcolour );
-    //fill the skids
-    fill_solid( &(sstrip[0]), STOTALPIXELS , newcolour );
-    //fill the tail
-    fill_solid( &(tstrip[0]), TTOTALPIXELS , newcolour );
-
-
-    Show();
-    RadioCheck();
-  }
-
-}
-
-
-void HueMergeAllUntil (uint32_t until, uint8_t starthue, uint32_t endhue) { // merge from one solid hue to another on canopy, tail and skids
-
-  CRGB startcolour = CHSV(starthue, 255, 255);
-  CRGB endcolour = CHSV(endhue, 255, 255);
-  // until = The radiomillis when this colour merge ends
-  // starthue = The starting 8 bit hue
-  // endhue = The ending 8 bit hue
-
-  RadioCheck();
-  uint32_t starttime = radiomillis;
-  uint32_t totalduration = until - radiomillis;
-  while (radiomillis < until)
-
-  {
-    uint32_t elapsed = radiomillis - starttime;
-    uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
-
     CRGB newcolour = startcolour.lerp8(endcolour, fraction);
-
-    Serial.println(newcolour);
-    //fill the canopy
-    fill_solid( &(cstrip[0]), CTOTALPIXELS , newcolour );
-    //fill the skids
-    fill_solid( &(sstrip[0]), STOTALPIXELS , newcolour );
-    //fill the tail
-    fill_solid( &(tstrip[0]), TTOTALPIXELS , newcolour );
-
+    
+    Canopy(newcolour);
+    Skids(newcolour);
+    Tail(newcolour);
     Show();
     RadioCheck();
   }
 
 }
 
-
-
-void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1, uint32_t startcolour, uint32_t endcolour, uint8_t fade) { // merge from one colour to another, but with the canopy and tail boom sparkling
+void SparkleMerge1 (uint32_t until, float howmany1, CRGB startcolour, CRGB endcolour, uint8_t fade) { // merge from one colour to another, but with the canopy and tail boom sparkling
 
   // until = The radiomillis when this colour merge ends
   // startcolour = The starting RGB colour
@@ -665,7 +559,7 @@ void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1,
     uint32_t elapsed = radiomillis - starttime;
     uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
 
-    CRGB newcolour = CRGB(startcolour).lerp8(CRGB(endcolour), fraction);
+    CRGB newcolour = startcolour.lerp8(endcolour, fraction);
 
     for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
       if (random16(10000) < howmany1) {
@@ -679,11 +573,9 @@ void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1,
         tstrip[j] = newcolour;
       }
     }
-    //fill the skids
-    fill_solid( &(sstrip[0]), STOTALPIXELS , newcolour );
-    //fill the tailfin
-    fill_solid( &(tstrip[TAILFINFIRST]), TAILFINLAST - TAILFINFIRST + 1 , newcolour );
 
+    Skids(newcolour);
+    TailFin(newcolour);
 
     FastLED.show();
     nscale8(cstrip, CTOTALPIXELS, fade);
@@ -692,8 +584,6 @@ void ColourMergeAllSparklingCanopyTailBoomUntil (uint32_t until, float howmany1,
   }
 
 }
-
-
 
 // Spectrum analyser function for the canopy
 void Spectrum(uint32_t until, uint32_t colour, uint8_t fade) {
@@ -720,11 +610,11 @@ void Spectrum(uint32_t until, uint32_t colour, uint8_t fade) {
 }
 
 // Spectrum analyser function for the canopy
-void SpectrumTwoColour(uint32_t until, uint32_t colour1, uint32_t colour2) {
+void SpectrumTwoColour(uint32_t until, CRGB colour1, CRGB colour2) {
 
   while (radiomillis < until)
   {
-    ColourCanopy(colour2);
+    Canopy(colour2);
 
     //run down the rows and channels
     for (uint16_t i = 0; i < 7; i++) {
@@ -742,7 +632,7 @@ void SpectrumTwoColour(uint32_t until, uint32_t colour1, uint32_t colour2) {
   }
 }
 
-void SpectrumTop(uint32_t until, uint32_t colour1, uint32_t colour2, uint8_t fade) {
+void SpectrumTop(uint32_t until, CRGB colour1, CRGB colour2, uint8_t fade) {
 
   uint8_t tracker;
   while (radiomillis < until)
@@ -812,7 +702,7 @@ void SpectrumTop(uint32_t until, uint32_t colour1, uint32_t colour2, uint8_t fad
   }
 }
 
-void Starlights(uint32_t until, uint32_t colour, uint8_t fade, uint8_t wait) {
+void Starlights(uint32_t until, CRGB colour, uint8_t fade, uint8_t wait) {
 
   while (radiomillis < until)
   {
@@ -849,8 +739,7 @@ void Starlights(uint32_t until, uint32_t colour, uint8_t fade, uint8_t wait) {
 
 }
 
-
-void ReverseStarlights(uint32_t until, uint32_t colour, uint8_t fade, uint8_t wait) {
+void ReverseStarlights(uint32_t until, CRGB colour, uint8_t fade, uint8_t wait) {
 
   while (radiomillis < until)
   {
@@ -946,9 +835,9 @@ void loop()
       // FADE_SPEED determines how fast the pixels fade to black (0= instant, 255= v.slow)
 
 
-      HueTwoSparkleAll( 0.8, m, n, 200);
-      ColourTail(BLACK);
-      ColourSkids (BLACK);
+      TwoSparkleAll( 0.8, CHSV(m, 255, 255), CHSV(n, 255, 255), 200);
+      Tail(black);
+      Skids (black);
 
       if (m % 10 == 0) {
         n += 1;
@@ -965,7 +854,7 @@ void loop()
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      ColourAll (BLACK);
+      All (black);
       Show();
       break; // end of stop mode
 
@@ -978,7 +867,7 @@ void loop()
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      ColourAll (DULLGREY);
+      All (dullgrey);
       Show();
       break; // end of demo mode
 
@@ -992,44 +881,42 @@ void loop()
 
       // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
 
-      //    ColourMergeAllSparklingCanopyTailBoomUntil (5000, 1, RED, BLUE, 100);
 
 
-      ColourAll(BLACK);
+      All(black);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
-      ColourMergeAllSparklingCanopyTailBoomUntil (19279, 0.3, BLACK, WHITE, 200);
-      ColourSkids(WHITE);
-      ColourTailFin(WHITE);
-      ColourSparkleCanopyTailBoomUntil(19365, 0.3, WHITE, 200); //up to chord change
-      ColourSparkleCanopyTailBoomUntil(21942, 1, WHITE, 200); //up to "we're marooned on a small island"
-      ColourMergeAllSparklingCanopyTailBoomUntil (23225, 1, WHITE, GREEN, 200); //merge through to "island" at 23225
-      ColourSparkleCanopyTailBoomUntil(25066, 1, GREEN, 200); //up to "in an endless"
-      ColourMergeAllSparklingCanopyTailBoomUntil (26342, 1, GREEN, BLUE, 200); //merge through to "sea" at 26342
-      ColourSparkleCanopyTailBoomUntil(28532, 1, BLUE, 200); //up to a point where it starts merging to yellow
-      ColourMergeAllSparklingCanopyTailBoomUntil(29164, 1, BLUE, YELLOW, 200); //merged as it gets to sand
-      ColourSparkleCanopyTailBoomUntil(32322, 1, YELLOW, 200); //up to dramatic
-      ColourMergeAllUntil(32722, BLACK, RED); //up to "but tonight"
+      SparkleMerge1 (19279, 0.3, black, white, 200);
+      Skids(white);
+      TailFin(white);
+      SparkleCanopyTailBoomUntil(19365, 0.3, white, 200); //up to chord change
+      SparkleCanopyTailBoomUntil(21942, 1, white, 200); //up to "we're marooned on a small island"
+      SparkleMerge1 (23225, 1, white, green, 200); //merge through to "island" at 23225
+      SparkleCanopyTailBoomUntil(25066, 1, green, 200); //up to "in an endless"
+      SparkleMerge1 (26342, 1, green, blue, 200); //merge through to "sea" at 26342
+      SparkleCanopyTailBoomUntil(28532, 1, blue, 200); //up to a point where it starts merging to yellow
+      SparkleMerge1(29164, 1, blue, yellow, 200); //merged as it gets to sand
+      SparkleCanopyTailBoomUntil(32322, 1, yellow, 200); //up to dramatic
+      Merge1(32722, black, red); //up to "but tonight"
       WaitUntil(35573);
-      Starlights(38452, RED, 200, 5);
-      ColourTailFin(CYAN);
-      ColourSkids(CYAN);
-      Starlights(41723, CYAN, 200, 5);
-      ColourTailFin(GREEN);
-      ColourSkids(GREEN);
-      Starlights(47554, GREEN, 200, 5);
-      ColourMergeAllUntil(48054, BLACK, ORANGE); //this is the start of whaa
+      Starlights(38452, red, 200, 5);
+      TailFin(cyan);
+      Skids(cyan);
+      Starlights(41723, cyan, 200, 5);
+      TailFin(green);
+      Skids(green);
+      Starlights(47554, green, 200, 5);
+      Merge1(48054, black, orange); //this is the start of whaa
       WaitUntil(52616);
-      ColourSkids(ORANGE);
-      ColourMergeAllSparklingCanopyTailBoomUntil(55279, 50, ORANGE, BLACK, 20); //Bam1 up to Bam2 orange to black 50% sparkling
+      Skids(orange);
+      SparkleMerge1(55279, 50, orange, black, 20); //Bam1 up to Bam2 orange to black 50% sparkling
       WaitUntil(55379);
-      ColourMergeAllSparklingCanopyTailBoomUntil(58089, 50, GREEN, BLACK, 20); //Bam2 up to Bam3
+      SparkleMerge1(58089, 50, green, black, 20); //Bam2 up to Bam3
       WaitUntil(58189);
-      ColourMergeAllSparklingCanopyTailBoomUntil(60829, 50, CYAN, BLACK, 20); //Bam3 up to Bam4
+      SparkleMerge1(60829, 50, cyan, black, 20); //Bam3 up to Bam4
       WaitUntil(60929);
-      ColourMergeAllSparklingCanopyTailBoomUntil(63545, 50, YELLOW, BLACK, 20); //Ba4 up to Building up
+      SparkleMerge1(63545, 50, yellow, black, 20); //Ba4 up to Building up
       WaitUntil(63645);
-
-      ColourAll(BLACK);
+      All(black);
       Finish();
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
