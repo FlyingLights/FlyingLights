@@ -518,7 +518,7 @@ void TwoSparkleCanopyUntil(uint32_t waituntil, float howmany1, CRGB colour1, CRG
 }
 
 
-void Merge1 (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from one solid colour to another on canopy, tail and skids
+void MergeAll (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from one solid colour to another on canopy, tail and skids
 
   // until = The radiomillis when this colour merge ends
   // startcolour = The starting RGB colour
@@ -896,7 +896,7 @@ void loop()
       SparkleCanopyTailBoomUntil(28532, 1, blue, 200); //up to a point where it starts merging to yellow
       SparkleMerge1(29164, 1, blue, yellow, 200); //merged as it gets to sand
       SparkleCanopyTailBoomUntil(32322, 1, yellow, 200); //up to dramatic
-      Merge1(32722, black, red); //up to "but tonight"
+      MergeAll(32722, black, red); //up to "but tonight"
       WaitUntil(35573);
       Starlights(38452, red, 200, 5);
       TailFin(cyan);
@@ -905,7 +905,7 @@ void loop()
       TailFin(green);
       Skids(green);
       Starlights(47554, green, 200, 5);
-      Merge1(48054, black, orange); //this is the start of whaa
+      MergeAll(48054, black, orange); //this is the start of whaa
       WaitUntil(52616);
       Skids(orange);
       SparkleMerge1(55279, 50, orange, black, 20); //Bam1 up to Bam2 orange to black 50% sparkling
