@@ -10,8 +10,9 @@
 #define STOTALPIXELS 23 //total number of pixels on the skids
 #define TTOTALPIXELS 47 //TOTALNUMBER OF PIXELS ON THE tail
 
-// this defines the number of rows (horizontal strips) and
-// columns (number of LEDS on the longest strip
+// this defines the number of ROWS (horizontal strips) and
+// COLUMNS (number of LEDS on the longest strip)
+// on your heli canopy
 #define COLUMNS 37 // THE NUMBER OF COLUMNS OF CANOPY LEDS
 #define ROWS 8 // THE NUMBER OF ROWS OF CANOPY LEDS
 
@@ -29,6 +30,7 @@
 
 // this defines the LED matrix on the LEFT canopy. The numbers are the addresses of the LEDs in rows from FRONT to BACK, running from TOP to BOTTOM
 // 999 refers to an LED that is not present
+// You can use the Excel file leftcanopy_array_maker.xlsx to make this
 uint16_t leftcanopy [][37] = {
   {999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 336, 337, 338, 339, 340, 341, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999},
   {999, 999, 999, 999, 999, 999, 999, 999, 308, 307, 306, 305, 304, 303, 302, 301, 300, 299, 298, 297, 296, 295, 294, 293, 292, 291, 290, 289, 288, 999, 999, 999, 999, 999, 999, 999, 999},
@@ -42,6 +44,7 @@ uint16_t leftcanopy [][37] = {
 
 // this defines the LED matrix on the RIGHT canopy. The numbers are the addresses of the LEDs in rows from FRONT to BACK, running from TOP to BOTTOM
 // 999 refers to an LED that is not present
+// You can use the Excel file rightcanopy_array_maker.xlsx to make this
 uint16_t rightcanopy [][37] = {
   {999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 335, 334, 333, 332, 331, 330, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999},
   {999, 999, 999, 999, 999, 999, 999, 999, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 999, 999, 999, 999, 999, 999, 999, 999},
@@ -81,61 +84,35 @@ uint16_t rightcanopy [][37] = {
 //initialise the radio
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
+//define the pins that the LED strips are connected to on the Feather board
 #define CPIN 13  // THE PIN NUMBER ON THE BOARD THAT THE CANOPY DATA WIRE IS CONNECTED TO
 #define SPIN 11 // THE PIN NUMBER ON THE BOARD THAT THE SKIDS DATA WIRE IS CONNECTED TO
 #define TPIN 10  // THE PIN NUMBER ON THE BOARD THAT THE TAIL DATA WIRE IS CONNECTED TO
 
+// set up some RGB colours for easy reference. This is about all you need!
+const CRGB blue = CRGB(0x0000FF);
+const CRGB red = CRGB(0xFF0000);
+const CRGB green = CRGB(0x00FF00);
+const CRGB magenta = CRGB(0xFF00FF);
+const CRGB cyan = CRGB(0x00FFFF);
+const CRGB yellow = CRGB(0xFFFF00);
+const CRGB orange = CRGB(0xFF4500);
+const CRGB pink = CRGB(0xDC143C);
+const CRGB dullyellow = CRGB(0x222200);
+const CRGB dullred = CRGB(0x220000);
+const CRGB dullgreen = CRGB(0x002200);
+const CRGB dullcyan = CRGB(0x002222);
+const CRGB dullmagenta = CRGB(0x220022);
+const CRGB dullblue = CRGB(0x000022);
+const CRGB dullorange = CRGB(0x220900);
+const CRGB dullpink = CRGB(0x1D0308);
+const CRGB black = CRGB(0x000000);
+const CRGB white = CRGB(0xFFFFFF);
+const CRGB lightgrey = CRGB(0x222222);
+const CRGB grey = CRGB(0x101010);
+const CRGB dullgrey = CRGB(0x060606);
 
-// set up some useful colours for easy reference later
-#define BLUE 0x0000FF
-#define RED 0xFF0000
-#define GREEN 0x00FF00
-#define MAGENTA 0xFF00FF
-#define CYAN 0x00FFFF
-#define YELLOW 0xFFFF00
-#define ORANGE 0xFF4500
-#define PINK 0xDC143C
-#define DULLYELLOW 0x222200
-#define DULLRED 0x220000
-#define DULLGREEN 0x002200
-#define DULLCYAN 0x002222
-#define DULLMAGENTA 0x220022
-#define DULLBLUE 0x000022
-#define DULLORANGE 0x220900
-#define DULLPINK 0x1D0308
-#define BLACK 0x000000
-#define WHITE 0xFFFFFF
-#define LIGHTGREY 0x222222
-#define GREY 0x101010
-#define DULLGREY 0x060606
-
-
-const CRGB blue = CRGB( BLUE);
-const CRGB red = CRGB( RED);
-const CRGB green = CRGB( GREEN);
-const CRGB magenta = CRGB( MAGENTA);
-const CRGB cyan = CRGB( CYAN);
-const CRGB yellow = CRGB( YELLOW );
-const CRGB orange = CRGB( ORANGE );
-const CRGB pink = CRGB( PINK);
-const CRGB dullyellow = CRGB( DULLYELLOW);
-const CRGB dullred = CRGB( DULLRED);
-const CRGB dullgreen = CRGB( DULLGREEN);
-const CRGB dullcyan = CRGB( DULLCYAN);
-const CRGB dullmagenta = CRGB( DULLMAGENTA);
-const CRGB dullblue = CRGB( DULLBLUE);
-const CRGB dullorange = CRGB( DULLORANGE);
-const CRGB dullpink = CRGB( DULLPINK);
-const CRGB black = CRGB( BLACK);
-const CRGB white = CRGB( WHITE);
-const CRGB lightgrey = CRGB( LIGHTGREY);
-const CRGB grey = CRGB( GREY);
-const CRGB dullgrey = CRGB( DULLGREY);
-
-
-// prefined hue colours. These come from the FASTLED library
-//  HUE_RED = 0, HUE_ORANGE = 32, HUE_YELLOW = 64, HUE_GREEN = 96,
-//  HUE_AQUA = 128, HUE_BLUE = 160, HUE_PURPLE = 192, HUE_PINK = 224
+#define DEMO_MODE 0 // used for clarity to pass 0 into functions when in demo or ready modes
 
 CRGB cstrip[CTOTALPIXELS]; //setup the array for the canopy leds
 CRGB sstrip[STOTALPIXELS]; //setup the array for the skid leds
@@ -155,22 +132,27 @@ uint32_t radiomillis;
 // used to put a bright spot on the top of the spectrumtop function bars
 uint8_t leftspectrumtop[7];
 uint8_t rightspectrumtop[7];
+// leftmax and rightmax store where the last actual pixel is on each row rather than a 999 blank. Used for spectrumtop function
+uint8_t leftmax[7];
+uint8_t rightmax[7];
 
 // This variable is used for the starlights function. One variable for each row.
 uint8_t starlights[ROWS];
 
 uint8_t n; //just a handy reusable 8bit unsigned integer!
 uint8_t m; //just a handy reusable 8bit unsigned integer!
-uint8_t leftmax[7];
-uint8_t rightmax[7];
 
-// this is a variable that triggers the functions to only run through once in demo & ready modes
+// this is a variable that triggers the functions to only execute once in demo & ready modes (when it is TRUE)
+// in run mode it is set to FALSE and the functions will execute until a particular time is reached
 bool runthrough;
+
+// Setup a dynamic palette for use in palette-based functions
+CRGBPalette16 FLpal;
 
 void setup()
 {
 
-  //PUT THE VALUE OF COLUMNS INTO EACH OF STARLIGHTS
+  //put the value of COLUMNS into the variables in starlights[] array to get it ready
   for (uint8_t f = 0; f < ROWS; f++)
   {
     starlights[f] = COLUMNS;
@@ -201,6 +183,7 @@ void setup()
       }
     }
 
+    //serial print just for debugging
     Serial.print(f);
     Serial.print(" leftmax:");
     Serial.print(leftmax[f]);
@@ -349,38 +332,7 @@ void Finish()  // when this is reached it will hold until another mode is select
     RadioCheck();
     Printout();
   }
-
 }
-
-
-
-//void SparkleCanopyTailBoom(float howmany1, CRGB colour1, uint8_t fade)
-//{
-//
-//  howmany1 *= 100;
-//
-//  for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
-//    if (random16(10000) < howmany1) {
-//      cstrip[j] = colour1;
-//    }
-//  }
-//
-//  for (uint16_t j = BOOMFRONT; j <= BOOMREAR; j++) {
-//    if (random16(10000) < howmany1) {
-//      tstrip[j] = colour1;
-//    }
-//  }
-//
-//  TailFin(colour1);  // bug
-//
-//  FastLED.show();
-//
-//  nscale8(cstrip, CTOTALPIXELS, fade);
-//  nscale8(tstrip, TTOTALPIXELS, fade);
-//
-//}
-//
-
 
 
 void SparkleCanopyTailBoom(uint32_t waituntil, float howmany1, CRGB colour1, uint8_t fade)
@@ -516,10 +468,6 @@ void TwoSparkleAll(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour
   }
 }
 
-
-
-
-
 void TwoSparkleCanopy(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
 {
 
@@ -541,7 +489,70 @@ void TwoSparkleCanopy(uint32_t waituntil, float howmany1, CRGB colour1, CRGB col
     }
 
     FastLED.show();
+    nscale8(cstrip, CTOTALPIXELS, fade);
 
+    RadioCheck();
+    if (runthrough) {
+      break;
+    }
+  }
+}
+
+
+void PaletteSparkleAll(uint32_t waituntil, float howmany1, CRGBPalette16 palette1, uint8_t fade)
+{
+
+  howmany1 *= 100;
+  while (radiomillis < waituntil || runthrough)
+  {
+
+    for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        cstrip[j] = ColorFromPalette(palette1, random8());
+      }
+    }
+
+    for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        tstrip[j] = ColorFromPalette(palette1, random8());
+      }
+    }
+
+    for (uint16_t j = 0; j < STOTALPIXELS; j++) {
+
+      if (random16(10000) < howmany1) {
+        sstrip[j] = ColorFromPalette(palette1, random8());
+      }
+    }
+
+    FastLED.show();
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    nscale8(tstrip, TTOTALPIXELS, fade);
+    nscale8(sstrip, STOTALPIXELS, fade);
+
+    RadioCheck();
+
+    if (runthrough) {
+      break;
+    }
+  }
+}
+
+
+void PaletteSparkleCanopy(uint32_t waituntil, float howmany1, CRGBPalette16 palette1, uint8_t fade)
+{
+
+  howmany1 *= 100;
+  while (radiomillis < waituntil || runthrough)
+  {
+
+    for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        cstrip[j] = ColorFromPalette(palette1, random8());
+      }
+    }
+
+    FastLED.show();
     nscale8(cstrip, CTOTALPIXELS, fade);
 
     RadioCheck();
@@ -573,11 +584,9 @@ void MergeAll (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from
     Skids(newcolour);
     Tail(newcolour);
     Show();
+
     RadioCheck();
-
-
   }
-
 }
 
 void SparkleMerge1 (uint32_t until, float howmany1, CRGB startcolour, CRGB endcolour, uint8_t fade) { // merge from one colour to another, but with the canopy and tail boom sparkling
@@ -617,10 +626,11 @@ void SparkleMerge1 (uint32_t until, float howmany1, CRGB startcolour, CRGB endco
     FastLED.show();
     nscale8(cstrip, CTOTALPIXELS, fade);
     nscale8(tstrip, TTOTALPIXELS, fade);
+
     RadioCheck();
   }
-
 }
+
 
 // Spectrum analyser function for the canopy
 void Spectrum(uint32_t until, uint32_t colour, uint8_t fade) {
@@ -668,6 +678,7 @@ void SpectrumTwoColour(uint32_t until, CRGB colour1, CRGB colour2) {
     }
     // show the pixels
     FastLED.show();
+
     RadioCheck();
     if (runthrough) {
       break;
@@ -836,6 +847,72 @@ void ReverseStarlights(uint32_t until, CRGB colour, uint8_t fade, uint8_t wait) 
 
 }
 
+
+void PaletteCycleAll(uint32_t until, CRGBPalette16 palette1, uint8_t fastness) {
+
+  while (radiomillis < until || runthrough)
+  {
+
+    m = m + fastness;
+    CRGB colour1 = ColorFromPalette(palette1, m);
+    Canopy(colour1);
+    Skids(colour1);
+    Tail(colour1);
+
+    // show the pixels
+    FastLED.show();
+
+    //check the radio
+    RadioCheck();
+    if (runthrough) {
+      break;
+    }
+  }
+
+}
+
+       
+void ShiftingPaletteCanopy(uint32_t until, CRGBPalette16 palette1, uint8_t shiftyh, uint8_t shiftyv, uint8_t fastness) {
+
+  while (radiomillis < until || runthrough)
+  {
+
+    m = m + fastness;
+
+  for (int j = 0; j < COLUMNS; j++) {
+    for (int q = 0; q < ROWS; q++) {
+          cstrip[(leftcanopy [q][j])] = ColorFromPalette(palette1, m+(j*shiftyh)+(q*shiftyv));  
+             cstrip[(rightcanopy [q][j])] = ColorFromPalette(palette1, m+(j*shiftyh)+(q*shiftyv));  
+    }
+  }
+
+    // show the pixels
+    FastLED.show();
+
+    //check the radio
+    RadioCheck();
+    if (runthrough) {
+      break;
+    }
+  }
+
+}
+
+
+void ShiftingTwoSparkle() {
+
+  TwoSparkleAll(0, 0.8, CHSV(m, 255, 255), CHSV(n, 255, 255), 200);
+
+  Tail(black);
+  Skids (black);
+
+  if (m % 10 == 0) {
+    n += 1;
+  }
+  m += 1;
+
+}
+
 void loop()
 {
 
@@ -846,55 +923,44 @@ void loop()
 
     case 2:  //ready mode when radio.mode=2
       runthrough = true;
+
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // READY MODE IS GENERALLY USED WHEN THE HELI IS WAITING TO START ROUTINE /////////////////////////////////////////////
-      // CAN USE MOST FUNCTIONS BUT NOT "MERGE" FUNCTIONS   /////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // READY MODE CAN BE USED WHEN THE HELI IS WAITING TO START ROUTINE ///////////////////////////////////////////////////
+      // IT DOES NOT PLAY ANY MUSIC /////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-      //TwoSparkleAll(0, 0.8, CHSV(m, 255, 255), CHSV(n, 255, 255), 200);
-
-      SparkleAll(0, 0.8, CHSV(n, 255, 255), 200);
-
-      Tail(black);
-      Skids (black);
-
-      if (m % 10 == 0) {
-        n += 1;
-      }
-      m += 1;
+      ShiftingTwoSparkle();
 
       break; // end of ready mode
 
     case 3:  // stop mode when radio.mode=3
       runthrough = true;
+
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // STOP MODE IS GENERALLY USED TO SWITCH OFF ALL LEDS /////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // STOP MODE IS USED TO SWITCH OFF ALL LEDS ///////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       All (black);
+      //in demo, stop & ready modes you need to use Show() to make static colours work
       Show();
       break; // end of stop mode
 
     case 4:   // demo mode when radio.mode=4
       runthrough = true;
+
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // DEMO MODE //////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // CAN USE STATIC COLOURS OR DYNAMIC PATTERNS BUT NOT "UNTIL" FUNCTIONS   /////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // DEMO MODE IS USED TO MAKE SURE EVERYTHING IS WORKING WHEN SETTING UP////////////////////////////////////////////////
+      // THE LIGHTING FUNCTIONS SHOULD TEST EVERY LED ///////////////////////////////////////////////////////////////////////
+      // IT WILL PLAY demo.mp3 ON THE MP3 PLAYER TO TEST THE MUSIC IS WORKING ///////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      All (dullgrey);
-      Show();
+      PaletteSparkleAll(DEMO_MODE, 1, LavaColors_p, 200);
+
       break; // end of demo mode
 
     case 1: //run mode when radio.mode=1
       runthrough = false;
+
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // THIS IS WHERE THE CODE GOES THAT RUNS THE NIGHT FLYING ROUTINE /////////////////////////////////////////////////////
@@ -904,7 +970,9 @@ void loop()
       // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
 
 
- //     SparkleAll(7000, 0.3,  cyan, 50);
+      ShiftingPaletteCanopy(70000, RainbowStripeColors_p,1,10, 1);
+
+
       All(black);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
       SparkleMerge1 (19279, 0.3, black, white, 200);
