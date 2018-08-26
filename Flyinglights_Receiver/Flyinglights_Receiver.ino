@@ -149,15 +149,293 @@ bool runthrough;
 // Setup a dynamic palette for use in palette-based functions
 CRGBPalette16 FLpal;
 
+DEFINE_GRADIENT_PALETTE( CandyStore_p ) {
+    0, 255,255,255,
+   45,   7, 12,255,
+  112, 227,  1,127,
+  112, 227,  1,127,
+  140, 255,255,255,
+  155, 227,  1,127,
+  196,  45,  1, 99,
+  255, 255,255,255};
+
+DEFINE_GRADIENT_PALETTE( JungleBoogie_p ) {
+    0,   0, 12,  0,
+   61, 153,239,112,
+  127,   0, 12,  0,
+  165, 106,239,  2,
+  196, 167,229, 71,
+  229, 106,239,  2,
+  255,   0, 12,  0};
+
+DEFINE_GRADIENT_PALETTE( Blellow_p ) {
+    0,   0,  0,  0,
+   66,  57,227,233,
+   96, 255,255,  8,
+  124, 255,255,255,
+  153, 255,255,  8,
+  188,  57,227,233,
+  255,   0,  0,  0};
+
+DEFINE_GRADIENT_PALETTE( Xmas_p ) {
+    0,   0, 12,  0,
+   40,   0, 55,  0,
+   66,   1,117,  2,
+   77,   1, 84,  1,
+   81,   0, 55,  0,
+  119,   0, 12,  0,
+  153,  42,  0,  0,
+  181, 121,  0,  0,
+  204, 255, 12,  8,
+  224, 121,  0,  0,
+  244,  42,  0,  0,
+  255,  42,  0,  0};
+
+DEFINE_GRADIENT_PALETTE( LaFrance_p ) {
+    0,   0,  0, 45,
+   71,   7, 12,255,
+   76,  75, 91,255,
+   76, 255,255,255,
+   81, 255,255,255,
+  178, 255,255,255,
+  179, 255, 55, 45,
+  196, 255,  0,  0,
+  255,  42,  0,  0};
+
+  DEFINE_GRADIENT_PALETTE( ForestPool_p ) {
+    0,   2,  5, 11,
+   30,  12, 10, 87,
+   48,  61,124,201,
+   63,  10, 54,111,
+   81,   1,  8, 68,
+  117,  88, 84,247,
+  145,   1, 12,  9,
+  175,  61,130, 43,
+  196,  31,146,  6,
+  234,   4, 31, 10,
+  255,   0,  1,  1};
+
+  DEFINE_GRADIENT_PALETTE( Teddybear_p ) {
+    0, 255,255, 45,
+   43, 208, 93,  1,
+  137, 224,  1,242,
+  181, 159,  1, 29,
+  255,  63,  4, 68};
+
+DEFINE_GRADIENT_PALETTE( PurpleNight_p ) {
+    0,   0,  0,  0,
+   66,  20,  4, 45,
+  132, 121, 20,255,
+  180, 179, 73,255,
+  228, 255,164,255,
+  241, 255,207,255,
+  255, 255,255,255};
+
+  DEFINE_GRADIENT_PALETTE( Tangerine_p ) {
+    0,   0,  0,  0,
+   14,   1,  1,  0,
+   29,   6,  1,  0,
+   57,  33,  3,  1,
+   85,  91,  9,  1,
+  114, 155, 22,  1,
+  144, 242, 43,  1,
+  165, 244, 70,  5,
+  186, 249,105, 17,
+  220, 252,171, 93,
+  255, 255,255,255};
+
+DEFINE_GRADIENT_PALETTE( ForestFlowers_p ) {
+    0,   2, 37, 16,
+   51,   2, 37, 16,
+   51,   3, 62, 11,
+  102,   3, 62, 11,
+  102,  42, 68,  6,
+  153,  42, 68,  6,
+  153, 109,112,  2,
+  204, 109,112,  2,
+  204, 242,100,  0,
+  255, 242,100,  0};
+
+DEFINE_GRADIENT_PALETTE( SpookyBlue_p ) {
+    0,  5,5,30,
+  101,  5,5,30,
+  102, 199,213,252,
+  122, 199,213,252,
+  126,  5,5,30,
+  151,  5,5,30,
+  152,  39, 34,245,
+  177,  39, 34,245,
+  178,  5,5,30,
+  203,  5,5,30,
+  204,  24,246,140,
+  227,  24,246,140,
+  229,  5,5,30,
+  252,  5,5,30,
+  255,   5,5,30};
+
+DEFINE_GRADIENT_PALETTE( GoldenRain_p ) {
+    0,   0,  0,  0,
+  124, 210,221,  1,
+  255, 255,255,255};
+
+DEFINE_GRADIENT_PALETTE( LiquidGold_p ) {
+    0, 255,255,  8,
+   73, 150, 16,  1,
+  153, 182,  1,  1,
+  244, 255,255,  8,
+  255, 255,255,  8};
+
+DEFINE_GRADIENT_PALETTE( ColouredLight_p ) {
+    0, 255,255,255,
+    5, 255,255,255,
+   43, 255, 12,  8,
+   51, 255,255,255,
+   68, 220, 47,  1,
+   89, 255,255,255,
+  109, 255,255,  8,
+  127, 255,255,255,
+  145,   3,178,  3,
+  160, 255,255,255,
+  178,   7, 12,255,
+  201, 255,255,255,
+  219, 121,  0,125,
+  244, 255,255,255,
+  255, 255,255,255};
+
+DEFINE_GRADIENT_PALETTE( GoddessMoon_p ) {
+    0,   2,  3, 20,
+   40,   2,  3, 27,
+   76,   2,  3, 19,
+  101,   5,  2, 73,
+  137,   5,  2, 73,
+  158, 255,255,174,
+  175,  11,  4,127,
+  221,   5,  2, 73,
+  249,   2,  3, 27,
+  255,   2,  3, 27};
+
+DEFINE_GRADIENT_PALETTE( Goldfish_p ) {
+    0, 186,223,245,
+   28, 190,223,214,
+   58, 222,233,228,
+   73, 222,233,228,
+   89, 186, 36,  5,
+  101, 206, 73, 14,
+  114, 157, 13,  1,
+  124, 206, 73, 14,
+  135,  46,  2,  1,
+  147, 157, 13,  1,
+  163, 210, 25,  1,
+  175, 222,233,228,
+  196, 177,221,240,
+  221, 186,221,192,
+  255, 206,229,250};
+
+DEFINE_GRADIENT_PALETTE( SubtleZebra_p ) {
+    0,   0,  0,  0,
+   20, 255,255,255,
+   53, 121,136,125,
+   81,   1,  2,  1,
+   96,   1,  2,  1,
+  130,  42, 55, 45,
+  145,  42, 55, 45,
+  165, 255,255,255,
+  183,  54, 62, 52,
+  211,  54, 62, 52,
+  229,  54, 62, 52,
+  242, 121,136,125,
+  255,   0,  0,  0};
+
+DEFINE_GRADIENT_PALETTE( NightStripes_p ) {
+    0,   1,  1,  1,
+   51,   1,  1,  1,
+   56, 255,255,255,
+   94, 255,255,255,
+  101,   1,  1,  1,
+  135,   1,  1,  1,
+  153,  18,  7,230,
+  255, 224, 10,  9};
+
+DEFINE_GRADIENT_PALETTE( Wasp_p ) {
+    0,   1,  1,  1,
+   40, 255,255,  8,
+   84,   1,  1,  1,
+   99,   1,  1,  1,
+  119, 255,255,  8,
+  142,   1,  1,  1,
+  155,   1,  1,  1,
+  198, 255,255,  8,
+  242,   1,  1,  1,
+  255,   1,  1,  1};
+
+DEFINE_GRADIENT_PALETTE( Xanadu_p ) {
+    0, 118,161,226,
+    5, 255,255, 45,
+   15, 252,203,156,
+   53,  79,  1,162,
+   94,  67,  1,  7,
+  132,   1, 55,156,
+  173,   1,127, 61,
+  211,  39, 45, 72,
+  255, 118,161,226};
+
+DEFINE_GRADIENT_PALETTE( RedNight_p ) {
+    0,   0,  0,  0,
+  124, 213,  1,  8,
+  255, 255,255,255};
+
+DEFINE_GRADIENT_PALETTE( CyanLight_p ) {
+    0,   0,  0,  0,
+  127,   3,178,151,
+  255, 255,255,255};
+
+DEFINE_GRADIENT_PALETTE( GreenLight_p ) {
+    0,   0,  0,  0,
+  127,  27,248,  1,
+  255, 255,255,255};
+
+DEFINE_GRADIENT_PALETTE( GrassHeart_p ) {
+    0,   1,199,  1,
+   56,   6, 93,  7,
+   84, 192, 47, 65,
+  119, 232,159,203,
+  155, 192, 47, 65,
+  206,   6, 93,  7,
+  255,   1,199,  1};
+
+DEFINE_GRADIENT_PALETTE( Tertiary_p ) {
+    0,   0,  1, 44,
+   63,  20,  1, 14,
+  127, 120,  1,  2,
+  191, 177, 66,  1,
+  255, 247,255,  0};
+
+DEFINE_GRADIENT_PALETTE( Topographic_p ) {
+    0, 255,255,255,
+   17, 215,187,245,
+   33, 153,146,252,
+   51,  87,130,250,
+   68,  39,139,221,
+   84,  14,169,160,
+  102,   5,211, 83,
+  119,   5,244, 23,
+  135,  13,209,  2,
+  153,  30,122,  1,
+  170,  41, 55,  0,
+  186,  37, 17,  1,
+  204,  22,  3,  1,
+  221,   7,  1,  1,
+  237,   1,  1,  1,
+  255,   0,  0,  0};
+
+
 void setup()
 {
 
   //put the value of COLUMNS into the variables in starlights[] array to get it ready
-  for (uint8_t f = 0; f < ROWS; f++)
-  {
-    starlights[f] = COLUMNS;
+  for (uint8_t f = 0; f < ROWS; f ++ ) { 
+      starlights[f] = COLUMNS; 
   }
-
   // set the unique address of this receiver
   rf95.setThisAddress(UNIQUE_ADDRESS);
 
@@ -871,7 +1149,7 @@ void PaletteCycleAll(uint32_t until, CRGBPalette16 palette1, uint8_t fastness) {
 
 }
 
-       
+
 void ShiftingPaletteCanopy(uint32_t until, CRGBPalette16 palette1, uint8_t shiftyh, uint8_t shiftyv, uint8_t fastness) {
 
   while (radiomillis < until || runthrough)
@@ -879,12 +1157,12 @@ void ShiftingPaletteCanopy(uint32_t until, CRGBPalette16 palette1, uint8_t shift
 
     m = m + fastness;
 
-  for (int j = 0; j < COLUMNS; j++) {
-    for (int q = 0; q < ROWS; q++) {
-          cstrip[(leftcanopy [q][j])] = ColorFromPalette(palette1, m+(j*shiftyh)+(q*shiftyv));  
-             cstrip[(rightcanopy [q][j])] = ColorFromPalette(palette1, m+(j*shiftyh)+(q*shiftyv));  
+    for (int j = 0; j < COLUMNS; j++) {
+      for (int q = 0; q < ROWS; q++) {
+        cstrip[(leftcanopy [q][j])] = ColorFromPalette(palette1, m + (j * shiftyh) + (q * shiftyv));
+        cstrip[(rightcanopy [q][j])] = ColorFromPalette(palette1, m + (j * shiftyh) + (q * shiftyv));
+      }
     }
-  }
 
     // show the pixels
     FastLED.show();
@@ -953,8 +1231,7 @@ void loop()
       // THE LIGHTING FUNCTIONS SHOULD TEST EVERY LED ///////////////////////////////////////////////////////////////////////
       // IT WILL PLAY demo.mp3 ON THE MP3 PLAYER TO TEST THE MUSIC IS WORKING ///////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      PaletteSparkleAll(DEMO_MODE, 1, LavaColors_p, 200);
+      PaletteSparkleAll(DEMO_MODE, 5, CandyStore_p, 220);
 
       break; // end of demo mode
 
@@ -970,7 +1247,7 @@ void loop()
       // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
 
 
-      ShiftingPaletteCanopy(70000, RainbowStripeColors_p,1,10, 1);
+      ShiftingPaletteCanopy(70000, RedNight_p, 2, 5, 2);
 
 
       All(black);
@@ -1019,6 +1296,7 @@ void loop()
       break; // end of run mode
   } // end of switch case
 } // end of loop
+
 
 
 
