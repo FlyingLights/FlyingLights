@@ -33,7 +33,6 @@ RHDatagram manager(rf95,TRANSMITTER_ADDRESS);
 
 // THIS DATA STRUCURE MATCHES THE ONE ON THE RECEIVER
 struct dataStruct {
-  uint8_t mode;
   uint8_t millisec[3];
   uint8_t spectrum[7];
 } myData;
@@ -60,10 +59,12 @@ void setup()
   pinMode(DemoPin, INPUT);
   pinMode(StopPin, INPUT);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!rf95.init())
     Serial.println("init failed");
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
+rf95.setPreambleLength(8);
+rf95.setModemConfig(RH_RF95::Bw500Cr45Sf128); // set the radio to work fast
 }
 
 void loop()
@@ -71,10 +72,13 @@ void loop()
 
 
   if (digitalRead(RunPin)) { //IF IT IS RUNNING
-    myData.mode = 1;                    //RUN IS 1
+
+    rf95.setHeaderId(1);
+ //   myData.mode = 1;                    //RUN IS 1
     if (millisec == 15000000) { //IF IT HAS BEEN STOPPED
       startmillis = millis();  //RESTART THE TIMER TO NOW
     }
+
 
 
     millisec = millis() - startmillis; //CALCULATE THE RUN TIME
@@ -86,28 +90,36 @@ void loop()
     }
   }
   else if (digitalRead(ReadyPin)) {
-    myData.mode = 2;                    //READY IS 2
+
+        rf95.setHeaderId(2);
+ //   myData.mode = 2;                    //READY IS 2
+
+    
     millisec = 15000000;  // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = 0  ;
     }
   }
   else if (digitalRead(DemoPin)) {
-    myData.mode = 4;                    //DEMO IS 4
+
+        rf95.setHeaderId(4);
+ //   myData.mode = 4;                    //DEMO IS 4
     millisec = 15000000; // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = f * 30 ;   // not actually useful just something I was testing!
     }
   }
   else {
-    myData.mode = 3;                    //STOP IS 3
+
+        rf95.setHeaderId(3);
+ //   myData.mode = 3;                    //STOP IS 3
     millisec = 15000000; // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = 0 ;
     }
   }
 
-  Serial.println(myData.mode); // just debugging
+ // Serial.println(myData.mode); // just debugging
 
 // split up millisec into four octets. Probably doesn't need the last one but I haven't taken it out yet!
   myData.millisec[0] = millisec;

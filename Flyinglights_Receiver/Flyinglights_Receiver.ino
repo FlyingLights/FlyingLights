@@ -118,9 +118,11 @@ CRGB cstrip[CTOTALPIXELS]; //setup the array for the canopy leds
 CRGB sstrip[STOTALPIXELS]; //setup the array for the skid leds
 CRGB tstrip[TTOTALPIXELS]; //setup the array for the tail leds
 
+
+  uint8_t mode;  //mode 1=run,2=ready,3=stop,4=demo
+
 //this is the data structure for the info that comes over the radio
 struct dataStruct {
-  uint8_t mode;  //mode 1=run,2=ready,3=stop,4=demo
   uint8_t millisec[3]; //millisecond timer is split up into 4 bytes
   uint8_t spectrum[7]; //spectrum analyser over seven channels
 } radio;
@@ -139,8 +141,9 @@ uint8_t rightmax[7];
 // This variable is used for the starlights function. One variable for each row.
 uint8_t starlights[ROWS];
 
-uint8_t n; //just a handy reusable 8bit unsigned integer!
-uint8_t m; //just a handy reusable 8bit unsigned integer!
+uint8_t n; //just a handy reusable global 8bit unsigned integer!
+uint8_t m; //just a handy reusable global 8bit unsigned integer!
+bool on_off; // a handy reuseable global boolean variable!
 
 // this is a variable that triggers the functions to only execute once in demo & ready modes (when it is TRUE)
 // in run mode it is set to FALSE and the functions will execute until a particular time is reached
@@ -150,291 +153,317 @@ bool runthrough;
 CRGBPalette16 FLpal;
 
 DEFINE_GRADIENT_PALETTE( CandyStore_p ) {
-    0, 255,255,255,
-   45,   7, 12,255,
-  112, 227,  1,127,
-  112, 227,  1,127,
-  140, 255,255,255,
-  155, 227,  1,127,
+  0, 255, 255, 255,
+  45,   7, 12, 255,
+  112, 227,  1, 127,
+  112, 227,  1, 127,
+  140, 255, 255, 255,
+  155, 227,  1, 127,
   196,  45,  1, 99,
-  255, 255,255,255};
+  255, 255, 255, 255
+};
 
 DEFINE_GRADIENT_PALETTE( JungleBoogie_p ) {
-    0,   0, 12,  0,
-   61, 153,239,112,
+  0,   0, 12,  0,
+  61, 153, 239, 112,
   127,   0, 12,  0,
-  165, 106,239,  2,
-  196, 167,229, 71,
-  229, 106,239,  2,
-  255,   0, 12,  0};
+  165, 106, 239,  2,
+  196, 167, 229, 71,
+  229, 106, 239,  2,
+  255,   0, 12,  0
+};
 
 DEFINE_GRADIENT_PALETTE( Blellow_p ) {
-    0,   0,  0,  0,
-   66,  57,227,233,
-   96, 255,255,  8,
-  124, 255,255,255,
-  153, 255,255,  8,
-  188,  57,227,233,
-  255,   0,  0,  0};
+  0,   0,  0,  0,
+  66,  57, 227, 233,
+  96, 255, 255,  8,
+  124, 255, 255, 255,
+  153, 255, 255,  8,
+  188,  57, 227, 233,
+  255,   0,  0,  0
+};
 
 DEFINE_GRADIENT_PALETTE( Xmas_p ) {
-    0,   0, 12,  0,
-   40,   0, 55,  0,
-   66,   1,117,  2,
-   77,   1, 84,  1,
-   81,   0, 55,  0,
+  0,   0, 12,  0,
+  40,   0, 55,  0,
+  66,   1, 117,  2,
+  77,   1, 84,  1,
+  81,   0, 55,  0,
   119,   0, 12,  0,
   153,  42,  0,  0,
   181, 121,  0,  0,
   204, 255, 12,  8,
   224, 121,  0,  0,
   244,  42,  0,  0,
-  255,  42,  0,  0};
+  255,  42,  0,  0
+};
 
 DEFINE_GRADIENT_PALETTE( LaFrance_p ) {
-    0,   0,  0, 45,
-   71,   7, 12,255,
-   76,  75, 91,255,
-   76, 255,255,255,
-   81, 255,255,255,
-  178, 255,255,255,
+  0,   0,  0, 45,
+  71,   7, 12, 255,
+  76,  75, 91, 255,
+  76, 255, 255, 255,
+  81, 255, 255, 255,
+  178, 255, 255, 255,
   179, 255, 55, 45,
   196, 255,  0,  0,
-  255,  42,  0,  0};
+  255,  42,  0,  0
+};
 
-  DEFINE_GRADIENT_PALETTE( ForestPool_p ) {
-    0,   2,  5, 11,
-   30,  12, 10, 87,
-   48,  61,124,201,
-   63,  10, 54,111,
-   81,   1,  8, 68,
-  117,  88, 84,247,
+DEFINE_GRADIENT_PALETTE( ForestPool_p ) {
+  0,   2,  5, 11,
+  30,  12, 10, 87,
+  48,  61, 124, 201,
+  63,  10, 54, 111,
+  81,   1,  8, 68,
+  117,  88, 84, 247,
   145,   1, 12,  9,
-  175,  61,130, 43,
-  196,  31,146,  6,
+  175,  61, 130, 43,
+  196,  31, 146,  6,
   234,   4, 31, 10,
-  255,   0,  1,  1};
+  255,   0,  1,  1
+};
 
-  DEFINE_GRADIENT_PALETTE( Teddybear_p ) {
-    0, 255,255, 45,
-   43, 208, 93,  1,
-  137, 224,  1,242,
+DEFINE_GRADIENT_PALETTE( Teddybear_p ) {
+  0, 255, 255, 45,
+  43, 208, 93,  1,
+  137, 224,  1, 242,
   181, 159,  1, 29,
-  255,  63,  4, 68};
+  255,  63,  4, 68
+};
 
 DEFINE_GRADIENT_PALETTE( PurpleNight_p ) {
-    0,   0,  0,  0,
-   66,  20,  4, 45,
-  132, 121, 20,255,
-  180, 179, 73,255,
-  228, 255,164,255,
-  241, 255,207,255,
-  255, 255,255,255};
+  0,   0,  0,  0,
+  66,  20,  4, 45,
+  132, 121, 20, 255,
+  180, 179, 73, 255,
+  228, 255, 164, 255,
+  241, 255, 207, 255,
+  255, 255, 255, 255
+};
 
-  DEFINE_GRADIENT_PALETTE( Tangerine_p ) {
-    0,   0,  0,  0,
-   14,   1,  1,  0,
-   29,   6,  1,  0,
-   57,  33,  3,  1,
-   85,  91,  9,  1,
+DEFINE_GRADIENT_PALETTE( Tangerine_p ) {
+  0,   0,  0,  0,
+  14,   1,  1,  0,
+  29,   6,  1,  0,
+  57,  33,  3,  1,
+  85,  91,  9,  1,
   114, 155, 22,  1,
   144, 242, 43,  1,
   165, 244, 70,  5,
-  186, 249,105, 17,
-  220, 252,171, 93,
-  255, 255,255,255};
+  186, 249, 105, 17,
+  220, 252, 171, 93,
+  255, 255, 255, 255
+};
 
 DEFINE_GRADIENT_PALETTE( ForestFlowers_p ) {
-    0,   2, 37, 16,
-   51,   2, 37, 16,
-   51,   3, 62, 11,
+  0,   2, 37, 16,
+  51,   2, 37, 16,
+  51,   3, 62, 11,
   102,   3, 62, 11,
   102,  42, 68,  6,
   153,  42, 68,  6,
-  153, 109,112,  2,
-  204, 109,112,  2,
-  204, 242,100,  0,
-  255, 242,100,  0};
+  153, 109, 112,  2,
+  204, 109, 112,  2,
+  204, 242, 100,  0,
+  255, 242, 100,  0
+};
 
 DEFINE_GRADIENT_PALETTE( SpookyBlue_p ) {
-    0,  5,5,30,
-  101,  5,5,30,
-  102, 199,213,252,
-  122, 199,213,252,
-  126,  5,5,30,
-  151,  5,5,30,
-  152,  39, 34,245,
-  177,  39, 34,245,
-  178,  5,5,30,
-  203,  5,5,30,
-  204,  24,246,140,
-  227,  24,246,140,
-  229,  5,5,30,
-  252,  5,5,30,
-  255,   5,5,30};
+  0,  5, 5, 30,
+  101,  5, 5, 30,
+  102, 199, 213, 252,
+  122, 199, 213, 252,
+  126,  5, 5, 30,
+  151,  5, 5, 30,
+  152,  39, 34, 245,
+  177,  39, 34, 245,
+  178,  5, 5, 30,
+  203,  5, 5, 30,
+  204,  24, 246, 140,
+  227,  24, 246, 140,
+  229,  5, 5, 30,
+  252,  5, 5, 30,
+  255,   5, 5, 30
+};
 
 DEFINE_GRADIENT_PALETTE( GoldenRain_p ) {
-    0,   0,  0,  0,
-  124, 210,221,  1,
-  255, 255,255,255};
+  0,   0,  0,  0,
+  124, 210, 221,  1,
+  255, 255, 255, 255
+};
 
 DEFINE_GRADIENT_PALETTE( LiquidGold_p ) {
-    0, 255,255,  8,
-   73, 150, 16,  1,
+  0, 255, 255,  8,
+  73, 150, 16,  1,
   153, 182,  1,  1,
-  244, 255,255,  8,
-  255, 255,255,  8};
+  244, 255, 255,  8,
+  255, 255, 255,  8
+};
 
 DEFINE_GRADIENT_PALETTE( ColouredLight_p ) {
-    0, 255,255,255,
-    5, 255,255,255,
-   43, 255, 12,  8,
-   51, 255,255,255,
-   68, 220, 47,  1,
-   89, 255,255,255,
-  109, 255,255,  8,
-  127, 255,255,255,
-  145,   3,178,  3,
-  160, 255,255,255,
-  178,   7, 12,255,
-  201, 255,255,255,
-  219, 121,  0,125,
-  244, 255,255,255,
-  255, 255,255,255};
+  0, 255, 255, 255,
+  5, 255, 255, 255,
+  43, 255, 12,  8,
+  51, 255, 255, 255,
+  68, 220, 47,  1,
+  89, 255, 255, 255,
+  109, 255, 255,  8,
+  127, 255, 255, 255,
+  145,   3, 178,  3,
+  160, 255, 255, 255,
+  178,   7, 12, 255,
+  201, 255, 255, 255,
+  219, 121,  0, 125,
+  244, 255, 255, 255,
+  255, 255, 255, 255
+};
 
 DEFINE_GRADIENT_PALETTE( GoddessMoon_p ) {
-    0,   2,  3, 20,
-   40,   2,  3, 27,
-   76,   2,  3, 19,
+  0,   2,  3, 20,
+  40,   2,  3, 27,
+  76,   2,  3, 19,
   101,   5,  2, 73,
   137,   5,  2, 73,
-  158, 255,255,174,
-  175,  11,  4,127,
+  158, 255, 255, 174,
+  175,  11,  4, 127,
   221,   5,  2, 73,
   249,   2,  3, 27,
-  255,   2,  3, 27};
+  255,   2,  3, 27
+};
 
 DEFINE_GRADIENT_PALETTE( Goldfish_p ) {
-    0, 186,223,245,
-   28, 190,223,214,
-   58, 222,233,228,
-   73, 222,233,228,
-   89, 186, 36,  5,
+  0, 186, 223, 245,
+  28, 190, 223, 214,
+  58, 222, 233, 228,
+  73, 222, 233, 228,
+  89, 186, 36,  5,
   101, 206, 73, 14,
   114, 157, 13,  1,
   124, 206, 73, 14,
   135,  46,  2,  1,
   147, 157, 13,  1,
   163, 210, 25,  1,
-  175, 222,233,228,
-  196, 177,221,240,
-  221, 186,221,192,
-  255, 206,229,250};
+  175, 222, 233, 228,
+  196, 177, 221, 240,
+  221, 186, 221, 192,
+  255, 206, 229, 250
+};
 
 DEFINE_GRADIENT_PALETTE( SubtleZebra_p ) {
-    0,   0,  0,  0,
-   20, 255,255,255,
-   53, 121,136,125,
-   81,   1,  2,  1,
-   96,   1,  2,  1,
+  0,   0,  0,  0,
+  20, 255, 255, 255,
+  53, 121, 136, 125,
+  81,   1,  2,  1,
+  96,   1,  2,  1,
   130,  42, 55, 45,
   145,  42, 55, 45,
-  165, 255,255,255,
+  165, 255, 255, 255,
   183,  54, 62, 52,
   211,  54, 62, 52,
   229,  54, 62, 52,
-  242, 121,136,125,
-  255,   0,  0,  0};
+  242, 121, 136, 125,
+  255,   0,  0,  0
+};
 
 DEFINE_GRADIENT_PALETTE( NightStripes_p ) {
-    0,   1,  1,  1,
-   51,   1,  1,  1,
-   56, 255,255,255,
-   94, 255,255,255,
+  0,   1,  1,  1,
+  51,   1,  1,  1,
+  56, 255, 255, 255,
+  94, 255, 255, 255,
   101,   1,  1,  1,
   135,   1,  1,  1,
-  153,  18,  7,230,
-  255, 224, 10,  9};
+  153,  18,  7, 230,
+  255, 224, 10,  9
+};
 
 DEFINE_GRADIENT_PALETTE( Wasp_p ) {
-    0,   1,  1,  1,
-   40, 255,255,  8,
-   84,   1,  1,  1,
-   99,   1,  1,  1,
-  119, 255,255,  8,
+  0,   1,  1,  1,
+  40, 255, 255,  8,
+  84,   1,  1,  1,
+  99,   1,  1,  1,
+  119, 255, 255,  8,
   142,   1,  1,  1,
   155,   1,  1,  1,
-  198, 255,255,  8,
+  198, 255, 255,  8,
   242,   1,  1,  1,
-  255,   1,  1,  1};
+  255,   1,  1,  1
+};
 
 DEFINE_GRADIENT_PALETTE( Xanadu_p ) {
-    0, 118,161,226,
-    5, 255,255, 45,
-   15, 252,203,156,
-   53,  79,  1,162,
-   94,  67,  1,  7,
-  132,   1, 55,156,
-  173,   1,127, 61,
+  0, 118, 161, 226,
+  5, 255, 255, 45,
+  15, 252, 203, 156,
+  53,  79,  1, 162,
+  94,  67,  1,  7,
+  132,   1, 55, 156,
+  173,   1, 127, 61,
   211,  39, 45, 72,
-  255, 118,161,226};
+  255, 118, 161, 226
+};
 
 DEFINE_GRADIENT_PALETTE( RedNight_p ) {
-    0,   0,  0,  0,
+  0,   0,  0,  0,
   124, 213,  1,  8,
-  255, 255,255,255};
+  255, 255, 255, 255
+};
 
 DEFINE_GRADIENT_PALETTE( CyanLight_p ) {
-    0,   0,  0,  0,
-  127,   3,178,151,
-  255, 255,255,255};
+  0,   0,  0,  0,
+  127,   3, 178, 151,
+  255, 255, 255, 255
+};
 
 DEFINE_GRADIENT_PALETTE( GreenLight_p ) {
-    0,   0,  0,  0,
-  127,  27,248,  1,
-  255, 255,255,255};
+  0,   0,  0,  0,
+  127,  27, 248,  1,
+  255, 255, 255, 255
+};
 
 DEFINE_GRADIENT_PALETTE( GrassHeart_p ) {
-    0,   1,199,  1,
-   56,   6, 93,  7,
-   84, 192, 47, 65,
-  119, 232,159,203,
+  0,   1, 199,  1,
+  56,   6, 93,  7,
+  84, 192, 47, 65,
+  119, 232, 159, 203,
   155, 192, 47, 65,
   206,   6, 93,  7,
-  255,   1,199,  1};
+  255,   1, 199,  1
+};
 
 DEFINE_GRADIENT_PALETTE( Tertiary_p ) {
-    0,   0,  1, 44,
-   63,  20,  1, 14,
+  0,   0,  1, 44,
+  63,  20,  1, 14,
   127, 120,  1,  2,
   191, 177, 66,  1,
-  255, 247,255,  0};
+  255, 247, 255,  0
+};
 
 DEFINE_GRADIENT_PALETTE( Topographic_p ) {
-    0, 255,255,255,
-   17, 215,187,245,
-   33, 153,146,252,
-   51,  87,130,250,
-   68,  39,139,221,
-   84,  14,169,160,
-  102,   5,211, 83,
-  119,   5,244, 23,
-  135,  13,209,  2,
-  153,  30,122,  1,
+  0, 255, 255, 255,
+  17, 215, 187, 245,
+  33, 153, 146, 252,
+  51,  87, 130, 250,
+  68,  39, 139, 221,
+  84,  14, 169, 160,
+  102,   5, 211, 83,
+  119,   5, 244, 23,
+  135,  13, 209,  2,
+  153,  30, 122,  1,
   170,  41, 55,  0,
   186,  37, 17,  1,
   204,  22,  3,  1,
   221,   7,  1,  1,
   237,   1,  1,  1,
-  255,   0,  0,  0};
+  255,   0,  0,  0
+};
 
 
 void setup()
 {
 
   //put the value of COLUMNS into the variables in starlights[] array to get it ready
-  for (uint8_t f = 0; f < ROWS; f ++ ) { 
-      starlights[f] = COLUMNS; 
+  for (uint8_t f = 0; f < ROWS; f ++ ) {
+    starlights[f] = COLUMNS;
   }
   // set the unique address of this receiver
   rf95.setThisAddress(UNIQUE_ADDRESS);
@@ -445,7 +474,7 @@ void setup()
   FastLED.addLeds<WS2812, SPIN, GRB>(sstrip, STOTALPIXELS);
 
   // only necessary for debugging
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   //work out which pixel in each row is the last "real" pixel rather than a 999 blank
   // this is used for the specttrumtops function. Just looks nicer!
@@ -472,6 +501,9 @@ void setup()
 
   if (!rf95.init())
     Serial.println("init failed");
+
+
+  rf95.setModemConfig(RH_RF95::Bw500Cr45Sf128);
 }
 
 void RadioCheck()  // this is used to check the LORA radio for incoming data
@@ -491,14 +523,16 @@ void RadioCheck()  // this is used to check the LORA radio for incoming data
       Serial.println("recv failed");
     }
     radiomillis = (uint32_t)radio.millisec[2] << 16 | (uint32_t)radio.millisec[1] << 8 | (uint32_t)radio.millisec[0];
+  
+  mode=rf95.headerId();
   }
 }
 
 void Printout() // just for serial debugging
 {
 
-  Serial.print(radio.mode);
-  Serial.print(" ");
+//  Serial.print(radio.mode);
+//  Serial.print(" ");
   Serial.print(radiomillis);
 
 
@@ -538,6 +572,9 @@ void Printout() // just for serial debugging
 
   //   Serial.print("got request: ");
   //     Serial.println((char*)buf);
+
+    Serial.print(" MODE: ");
+  Serial.print(mode);
   Serial.print(" RSSI: ");
   Serial.println(rf95.lastRssi(), DEC);
   Serial.println();
@@ -596,6 +633,27 @@ void SkidsUnder(CRGB colour) // set the underside of the skids to a solic colour
   fill_solid( &(sstrip[UNDERFRONTFIRST]), UNDERFRONTLAST - UNDERFRONTFIRST + 1 , colour );
   fill_solid( &(sstrip[UNDERREARFIRST]), UNDERREARLAST - UNDERREARFIRST + 1 , colour );
 }
+
+void EvenRows(CRGB colouration) {
+  Canopy(black);
+  for (int j = 0; j < COLUMNS; j++) {
+    for (int q = 0; q < ROWS; q = q + 2) {
+      cstrip[(leftcanopy [q][j])] = colouration;
+      cstrip[(rightcanopy [q][j])] = colouration;
+    }
+  }
+}
+
+void OddRows(CRGB colouration) {
+  Canopy(black);
+  for (int j = 0; j < COLUMNS; j++) {
+    for (int q = 1; q < ROWS; q = q + 2) {
+      cstrip[(leftcanopy [q][j])] = colouration;
+      cstrip[(rightcanopy [q][j])] = colouration;
+    }
+  }
+}
+
 
 void Show()
 {
@@ -861,6 +919,40 @@ void MergeAll (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from
     Canopy(newcolour);
     Skids(newcolour);
     Tail(newcolour);
+    Show();
+
+    RadioCheck();
+  }
+}
+
+
+void MergeCrazyBars (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from one solid colour to another on canopy, tail and skids
+
+  // until = The radiomillis when this colour merge ends
+  // startcolour = The starting RGB colour
+  // endcolour = The ending RGB colour
+  RadioCheck();
+  uint32_t starttime = radiomillis;
+  uint32_t totalduration = until - radiomillis;
+  while (radiomillis < until)
+
+  {
+    uint32_t elapsed = radiomillis - starttime;
+    uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
+
+    CRGB newcolour = startcolour.lerp8(endcolour, fraction);
+
+    if (on_off) {
+      EvenRows(newcolour);
+      TailBoom(black);
+    }
+    else
+    {
+      OddRows(newcolour);
+      TailBoom(newcolour);
+    }
+    on_off = !on_off;
+
     Show();
 
     RadioCheck();
@@ -1177,6 +1269,35 @@ void ShiftingPaletteCanopy(uint32_t until, CRGBPalette16 palette1, uint8_t shift
 }
 
 
+void Strobe(uint32_t until, CRGB colour1) {
+
+  while (radiomillis < until || runthrough)
+  {
+
+  Canopy(colour1);
+  Tail(colour1);
+  Skids(colour1);
+
+Show();
+
+  delay(5);
+  Canopy(black);
+  Tail(black);
+  Skids(black);
+
+Show();
+  delay(45);
+
+    //check the radio
+    RadioCheck();
+    if (runthrough) {
+      break;
+    }
+  }
+
+}
+
+
 void ShiftingTwoSparkle() {
 
   TwoSparkleAll(0, 0.8, CHSV(m, 255, 255), CHSV(n, 255, 255), 200);
@@ -1197,7 +1318,7 @@ void loop()
   RadioCheck(); //get the data from the radio
   Printout(); //serial.print just for debugging
 
-  switch (radio.mode) { // go different ways depending on the current radio mode
+  switch (mode) { // go different ways depending on the current radio mode
 
     case 2:  //ready mode when radio.mode=2
       runthrough = true;
@@ -1247,8 +1368,6 @@ void loop()
       // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
 
 
-      ShiftingPaletteCanopy(70000, RedNight_p, 2, 5, 2);
-
 
       All(black);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
@@ -1283,6 +1402,82 @@ void loop()
       WaitUntil(60929);
       SparkleMerge1(63545, 50, yellow, black, 20); //Ba4 up to Building up
       WaitUntil(63645);
+      MergeCrazyBars (64283, cyan, black);
+      MergeCrazyBars (64283, cyan, black);
+      MergeCrazyBars (64921, cyan, black);
+      MergeCrazyBars (65559, cyan, black);
+      MergeCrazyBars (66197, cyan, black);
+      MergeCrazyBars (66835, cyan, black);
+      MergeCrazyBars (67477, cyan, black);
+      MergeCrazyBars (67824 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(67824);
+      MergeCrazyBars (68196 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(68196);
+      MergeCrazyBars (68573 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(68573);
+      MergeCrazyBars (68904 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(68904);
+      MergeCrazyBars (69235 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(69235);
+      MergeCrazyBars (69595 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(69595);
+      MergeCrazyBars (69931 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(69931);
+      MergeCrazyBars (70280 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(70280);
+      MergeCrazyBars (70628 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(70628);
+      MergeCrazyBars (70982 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(70982);
+      MergeCrazyBars (71301 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(71301);
+      MergeCrazyBars (71644 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(71644);
+      MergeCrazyBars (71981 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(71981);
+      MergeCrazyBars (72335 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(72335);
+      MergeCrazyBars (72689 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(72689);
+      MergeCrazyBars (73025 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(73025);
+      MergeCrazyBars (73380 - 72, cyan, black);
+      Canopy(black); TailBoom(black); WaitUntil(73380);
+      MergeAll(73521, cyan, black);
+      WaitUntil(73551);
+      MergeAll(73692, cyan, black);
+      WaitUntil(73722);
+      MergeAll(73863, cyan, black);
+      WaitUntil(73893);
+      MergeAll(74034, cyan, black);
+      WaitUntil(74064);
+      MergeAll(74205, cyan, black);
+      WaitUntil(74235);
+      MergeAll(74376, cyan, black);
+      WaitUntil(74406);
+      MergeAll(74547, cyan, black);
+      WaitUntil(74577);
+      MergeAll(74718, cyan, black);
+      WaitUntil(74748);
+      MergeAll(74889, cyan, black);
+      WaitUntil(74919);
+      MergeAll(75060, cyan, black);
+      WaitUntil(75090);
+      MergeAll(75231, cyan, black);
+      WaitUntil(75261);
+      MergeAll(75402, cyan, black);
+      WaitUntil(75432);
+      MergeAll(75573, cyan, black);
+      WaitUntil(75603);
+      MergeAll(75744, cyan, black);
+      WaitUntil(75774);
+      MergeAll(75915, cyan, black);
+      WaitUntil(75945);
+      MergeAll(76086, cyan, black);
+      WaitUntil(76116);
+      Strobe(77577,cyan);
+      Strobe(78955,yellow);
+
       All(black);
       Finish();
 
