@@ -118,8 +118,11 @@ CRGB cstrip[CTOTALPIXELS]; //setup the array for the canopy leds
 CRGB sstrip[STOTALPIXELS]; //setup the array for the skid leds
 CRGB tstrip[TTOTALPIXELS]; //setup the array for the tail leds
 
-
-  uint8_t mode;  //mode 1=run,2=ready,3=stop,4=demo
+// this stores 5x5 sprites for characters, numbers and other shapes. Stored by (ASCII code-32) so the first one is ASCII code 32
+uint8_t sprites[][6] {{3, 0, 0, 0, 0, 0}, {1, 23, 0, 0, 0, 0}, {3, 3, 0, 3, 0, 0}, {5, 10, 31, 10, 31, 10}, {5, 10, 21, 10, 21, 10}, {5, 21, 10, 21, 10, 21}, {5, 31, 31, 31, 31, 31}, {1, 1, 0, 0, 0, 0}, {5, 31, 0, 31, 0, 31}, {5, 21, 21, 21, 21, 21}, {5, 4, 4, 4, 4, 4}, {5, 4, 4, 31, 4, 4}, {1, 24, 0, 0, 0, 0}, {5, 4, 4, 4, 4, 4}, {1, 16, 0, 0, 0, 0}, {5, 16, 8, 4, 2, 1}, {5, 31, 17, 17, 17, 31}, {5, 17, 17, 31, 16, 16}, {5, 25, 21, 21, 21, 22}, {5, 21, 21, 21, 21, 10}, {5, 15, 8, 8, 31, 8}, {5, 23, 21, 21, 21, 9}, {5, 14, 21, 21, 21, 9}, {5, 1, 1, 25, 5, 3}, {5, 10, 21, 21, 21, 10}, {5, 18, 21, 21, 21, 14}, {1, 10, 0, 0, 0, 0}, {1, 26, 0, 0, 0, 0}, {4, 21, 21, 10, 10, 0}, {5, 10, 10, 10, 10, 10}, {4, 10, 10, 21, 21, 0}, {5, 1, 1, 21, 5, 7}, {5, 31, 17, 21, 17, 31}, {5, 28, 10, 9, 10, 28}, {5, 31, 21, 21, 21, 10}, {5, 14, 17, 17, 17, 10}, {5, 31, 17, 17, 17, 14}, {5, 31, 21, 21, 17, 17}, {5, 31, 5, 5, 1, 1}, {5, 14, 17, 17, 21, 29}, {5, 31, 4, 4, 4, 31}, {5, 17, 17, 31, 17, 17}, {5, 8, 16, 16, 16, 15}, {5, 31, 4, 4, 10, 17}, {5, 31, 16, 16, 16, 16}, {5, 31, 2, 4, 2, 31}, {5, 31, 2, 4, 8, 31}, {5, 14, 17, 17, 17, 14}, {5, 31, 5, 5, 5, 2}, {5, 14, 17, 17, 25, 30}, {5, 31, 5, 5, 5, 26}, {5, 18, 21, 21, 21, 9},
+  {5, 1, 1, 31, 1, 1}, {5, 15, 16, 16, 16, 15}, {5, 7, 8, 16, 8, 7}, {5, 15, 16, 12, 16, 15}, {5, 17, 10, 4, 10, 17}, {5, 1, 2, 28, 2, 1}, {5, 17, 25, 21, 19, 17}, {2, 31, 17, 0, 0, 0}, {5, 1, 2, 4, 8, 16}, {2, 17, 31, 0, 0, 0}, {3, 2, 1, 2, 0, 0}, {3, 0, 0, 0, 0, 0}
+};
+uint8_t mode;  //mode 1=run,2=ready,3=stop,4=demo
 
 //this is the data structure for the info that comes over the radio
 struct dataStruct {
@@ -137,6 +140,10 @@ uint8_t rightspectrumtop[7];
 // leftmax and rightmax store where the last actual pixel is on each row rather than a 999 blank. Used for spectrumtop function
 uint8_t leftmax[7];
 uint8_t rightmax[7];
+
+uint32_t x;  //start time for repeating loops
+uint32_t y;  //end time for repeating loops
+uint32_t z;  //repeat interval for repeating loops
 
 // This variable is used for the starlights function. One variable for each row.
 uint8_t starlights[ROWS];
@@ -408,6 +415,11 @@ DEFINE_GRADIENT_PALETTE( RedNight_p ) {
   255, 255, 255, 255
 };
 
+DEFINE_GRADIENT_PALETTE( BlueBurst_p ) {
+  0,   0,  0,  10,
+  255, 40, 40, 255
+};
+
 DEFINE_GRADIENT_PALETTE( CyanLight_p ) {
   0,   0,  0,  0,
   127,   3, 178, 151,
@@ -523,16 +535,16 @@ void RadioCheck()  // this is used to check the LORA radio for incoming data
       Serial.println("recv failed");
     }
     radiomillis = (uint32_t)radio.millisec[2] << 16 | (uint32_t)radio.millisec[1] << 8 | (uint32_t)radio.millisec[0];
-  
-  mode=rf95.headerId();
+
+    mode = rf95.headerId();
   }
 }
 
 void Printout() // just for serial debugging
 {
 
-//  Serial.print(radio.mode);
-//  Serial.print(" ");
+  //  Serial.print(radio.mode);
+  //  Serial.print(" ");
   Serial.print(radiomillis);
 
 
@@ -573,7 +585,7 @@ void Printout() // just for serial debugging
   //   Serial.print("got request: ");
   //     Serial.println((char*)buf);
 
-    Serial.print(" MODE: ");
+  Serial.print(" MODE: ");
   Serial.print(mode);
   Serial.print(" RSSI: ");
   Serial.println(rf95.lastRssi(), DEC);
@@ -926,6 +938,32 @@ void MergeAll (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from
 }
 
 
+void MergeCanopyTailBoom (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from one solid colour to another on canopy, tail and skids
+
+  // until = The radiomillis when this colour merge ends
+  // startcolour = The starting RGB colour
+  // endcolour = The ending RGB colour
+  RadioCheck();
+  uint32_t starttime = radiomillis;
+  uint32_t totalduration = until - radiomillis;
+  while (radiomillis < until)
+
+  {
+    uint32_t elapsed = radiomillis - starttime;
+    uint32_t fraction = (elapsed << 8) / totalduration; //elapsed*256/totalduration gives the 8 bit fraction
+
+    CRGB newcolour = startcolour.lerp8(endcolour, fraction);
+
+    Canopy(newcolour);
+    TailBoom(newcolour);
+    Show();
+
+    RadioCheck();
+  }
+}
+
+
+
 void MergeCrazyBars (uint32_t until, CRGB startcolour, CRGB endcolour) { // merge from one solid colour to another on canopy, tail and skids
 
   // until = The radiomillis when this colour merge ends
@@ -1274,19 +1312,19 @@ void Strobe(uint32_t until, CRGB colour1) {
   while (radiomillis < until || runthrough)
   {
 
-  Canopy(colour1);
-  Tail(colour1);
-  Skids(colour1);
+    Canopy(colour1);
+    Tail(colour1);
+    Skids(colour1);
 
-Show();
+    Show();
 
-  delay(5);
-  Canopy(black);
-  Tail(black);
-  Skids(black);
+    delay(5);
+    Canopy(black);
+    Tail(black);
+    Skids(black);
 
-Show();
-  delay(45);
+    Show();
+    delay(45);
 
     //check the radio
     RadioCheck();
@@ -1311,6 +1349,238 @@ void ShiftingTwoSparkle() {
   m += 1;
 
 }
+
+void BeatCalculator(uint32_t xx, uint32_t yy, uint32_t zz) {
+  z = (yy - xx) / zz;
+  x = xx + (z);
+  y = yy + (z / 10);
+}
+
+void LittleBlock (int8_t row, int8_t column,  CRGB colour) {
+  for (int8_t rows = 0; rows < 3; rows++)
+  {
+    for (int8_t columns = 0; columns < 4; columns++)
+    {
+      int8_t east = column + columns;
+      int8_t south = row + rows;
+      if (east >= 0 && south >= 0 && east < COLUMNS && south < ROWS) {
+        cstrip[(leftcanopy [south][east])] = colour;
+        cstrip[(rightcanopy [south][east])] = colour;
+      }
+    }
+  }
+  Show();
+}
+
+
+void BigBlock (int8_t row, int8_t column,  CRGB colour) {
+  for (int8_t rows = 0; rows < 6; rows++)
+  {
+    for (int8_t columns = 0; columns < 8; columns++)
+    {
+      int8_t east = column + columns;
+      int8_t south = row + rows;
+      if (east >= 0 && south >= 0 && east < COLUMNS && south < ROWS) {
+        cstrip[(leftcanopy [south][east])] = colour;
+        cstrip[(rightcanopy [south][east])] = colour;
+      }
+    }
+  }
+  Show();
+}
+
+
+
+void DiscoPalette (uint32_t until, CRGBPalette16 palette1, uint8_t fade, uint8_t slowness) { // Disco effect based on a palette
+
+  while (radiomillis < until || runthrough)
+  {
+
+    LittleBlock (random8(ROWS), random8(COLUMNS), ColorFromPalette(palette1, random8()));
+    BigBlock (random8(ROWS), random8(COLUMNS), ColorFromPalette(palette1, random8()));
+    Show();
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    delay(slowness);
+    RadioCheck();
+    if (runthrough) {
+      break;
+    }
+  }
+}
+
+
+void SpectrumFire (uint32_t until, CRGBPalette16 palette1, uint8_t fade, uint8_t slowness) {
+
+  while (radiomillis < until || runthrough)
+  {
+
+    //run across the bars of the spectrum analyser
+    for (uint16_t i = 0; i < 7; i++) {
+
+      // work out the HEIGHT of the HORIZONTAL bars for each channel and put that in y
+      uint16_t height = (ROWS * radio.spectrum[i]) >> 9;
+      CRGB colourvariable = ColorFromPalette(palette1, radio.spectrum[i]);
+      // run UP the bar
+      for (uint16_t j = 0; j <= height; j++) {
+
+        //work out what the pixel number is
+
+        for (uint8_t f = 3; f <= 6; f++) {
+
+          uint8_t east = (i * 5) + f ;
+
+          cstrip[(leftcanopy [j + 4][east])] = colourvariable;
+          cstrip[(leftcanopy [4 - j][east])] = colourvariable;
+          cstrip[(rightcanopy [j + 4][east])] = colourvariable;
+          cstrip[(rightcanopy [4 - j][east])] = colourvariable;
+        }
+      }
+    }
+
+    Show();
+    nscale8(cstrip, CTOTALPIXELS, fade);
+
+    delay(slowness);
+    RadioCheck();
+    if (runthrough) {
+      break;
+    }
+  }
+}
+
+void SpriteBothSides (uint8_t ascii, int16_t row, int16_t column,  CRGB colour) {
+  if (ascii > 95) {  // if it is greater than an underscore then set it to 0, which will appear as a blank
+    ascii = 0;
+  }
+  else if (ascii < 32) // if it is less than 32 then make it 0, which will appear as a blank space.
+  {
+    ascii = 0;
+  }
+  else {
+    ascii = ascii - 32; //take 32 off the number to match with my array which starts with 0 = blank space = ascii 32
+  }
+
+
+  uint8_t width = sprites[ascii][0]; //the first byte in each subarray stores the width of the character
+
+  for (uint8_t place = 0; place < width; place++) //run through the width of the sprite/character
+  {
+
+    uint8_t reading = sprites[ascii][place + 1];
+
+    int16_t east = column + place;
+    if (east >= COLUMNS ) {  //if it is off the right of the canopy
+      break;
+    }
+    for (int16_t k = 0; k < 5; k++) //characters are 5 pixels high. Increase the number here for higher number of pixels
+    {
+      int16_t south = k + row;
+      if (south >= ROWS) {  //if it is off the bottom of the canopy
+        break;
+      }
+      if (bitRead(reading, k) == 1 && east >= 0 && south >= 0) {  //if it is a pixel and it is not off the top or left of the canopy
+        cstrip[(leftcanopy [south][east])] = colour;
+        cstrip[(rightcanopy [south][COLUMNS - east])] = colour;
+      }
+    }
+  }
+  m = width; //return the width in the global uint8_t m
+}
+
+
+void ScrollText(char text[], uint8_t row) {
+
+  CRGB colour = white;
+  int16_t firstcolumn = COLUMNS;
+  int16_t place;
+  int16_t endplace = COLUMNS;
+  uint8_t length = strlen(text);
+  Serial.print("strlen:");
+  Serial.println(length);
+  while (endplace > 0) {
+    place = firstcolumn;
+
+
+
+    for (uint8_t f = 0; f < length; f++) {
+      uint8_t ff = text[f];
+
+
+      if (ff > 95) // all the lower case letters and other stuff I don't use are >95
+      {
+        if (ff == 114) {
+          colour = red;  //r goes to red
+        }
+        if (ff == 115) {
+          colour = dullred;  //d goes to dullred
+        }
+        else if (ff == 103) {
+          colour = green; //g goes to green
+        }
+        else if (ff == 104) {
+          colour = dullgreen; //h goes to dullgreen
+        }
+        else if (ff == 98) {
+          colour = blue; //b goes to blue
+        }
+        else if (ff == 97) {
+          colour = dullblue; //a goes to dullblue
+        }
+        else if (ff == 121) {
+          colour = yellow; //y goes to yellow
+        }
+        else if (ff == 122) {
+          colour = dullyellow; //z goes to dullyellow
+        }
+        else if (ff == 109) {
+          colour = magenta; //m goes to magenta
+        }
+        else if (ff == 99) {
+          colour = cyan; //c goes to cyan
+        }
+        else if (ff == 100) {
+          colour = cyan; //d goes to dullcyan
+        }
+        else if (ff == 119) {
+          colour = white; //w goes to white
+        }
+        else if (ff == 116) {
+          colour = lightgrey; //t goes to lightgrey
+        }
+        else if (ff == 117) {
+          colour = grey; //u goes to grey
+        }
+                else if (ff == 118) {
+          colour = dullgrey; //v goes to dullgrey
+        }
+                        else if (ff == 111) {
+          colour = orange; //o goes to orange
+        }
+                                else if (ff == 111) {
+          colour = orange; //o goes to orange
+        }
+       
+
+      }
+      else {
+        SpriteBothSides (ff, row, place, colour);
+        place = place + m + 2;
+        Serial.print("m:");
+        Serial.print(m);
+      }
+    }
+
+    Show();
+    Canopy(black);
+    endplace = place;
+
+    firstcolumn--;
+    Serial.print(" endplace:");
+    Serial.println(endplace);
+  }
+
+}
+
 
 void loop()
 {
@@ -1352,7 +1622,10 @@ void loop()
       // THE LIGHTING FUNCTIONS SHOULD TEST EVERY LED ///////////////////////////////////////////////////////////////////////
       // IT WILL PLAY demo.mp3 ON THE MP3 PLAYER TO TEST THE MUSIC IS WORKING ///////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      PaletteSparkleAll(DEMO_MODE, 5, CandyStore_p, 220);
+      ScrollText("rOyPgTcIbPmOrWyEgRcEbD", 1);
+
+      Show();
+
 
       break; // end of demo mode
 
@@ -1366,8 +1639,6 @@ void loop()
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       // Help on using this section is at https://github.com/FlyingLights/FlyingLights/wiki/RUN-Functions
-
-
 
       All(black);
       WaitUntil(15279); // wait for "staring upwards at the gleaming stars in the obsidian sky"
@@ -1402,81 +1673,86 @@ void loop()
       WaitUntil(60929);
       SparkleMerge1(63545, 50, yellow, black, 20); //Ba4 up to Building up
       WaitUntil(63645);
-      MergeCrazyBars (64283, cyan, black);
-      MergeCrazyBars (64283, cyan, black);
-      MergeCrazyBars (64921, cyan, black);
-      MergeCrazyBars (65559, cyan, black);
-      MergeCrazyBars (66197, cyan, black);
-      MergeCrazyBars (66835, cyan, black);
-      MergeCrazyBars (67477, cyan, black);
-      MergeCrazyBars (67824 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(67824);
-      MergeCrazyBars (68196 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(68196);
-      MergeCrazyBars (68573 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(68573);
-      MergeCrazyBars (68904 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(68904);
-      MergeCrazyBars (69235 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(69235);
-      MergeCrazyBars (69595 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(69595);
-      MergeCrazyBars (69931 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(69931);
-      MergeCrazyBars (70280 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(70280);
-      MergeCrazyBars (70628 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(70628);
-      MergeCrazyBars (70982 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(70982);
-      MergeCrazyBars (71301 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(71301);
-      MergeCrazyBars (71644 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(71644);
-      MergeCrazyBars (71981 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(71981);
-      MergeCrazyBars (72335 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(72335);
-      MergeCrazyBars (72689 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(72689);
-      MergeCrazyBars (73025 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(73025);
-      MergeCrazyBars (73380 - 72, cyan, black);
-      Canopy(black); TailBoom(black); WaitUntil(73380);
-      MergeAll(73521, cyan, black);
-      WaitUntil(73551);
-      MergeAll(73692, cyan, black);
-      WaitUntil(73722);
-      MergeAll(73863, cyan, black);
-      WaitUntil(73893);
-      MergeAll(74034, cyan, black);
-      WaitUntil(74064);
-      MergeAll(74205, cyan, black);
-      WaitUntil(74235);
-      MergeAll(74376, cyan, black);
-      WaitUntil(74406);
-      MergeAll(74547, cyan, black);
-      WaitUntil(74577);
-      MergeAll(74718, cyan, black);
-      WaitUntil(74748);
-      MergeAll(74889, cyan, black);
-      WaitUntil(74919);
-      MergeAll(75060, cyan, black);
-      WaitUntil(75090);
-      MergeAll(75231, cyan, black);
-      WaitUntil(75261);
-      MergeAll(75402, cyan, black);
-      WaitUntil(75432);
-      MergeAll(75573, cyan, black);
-      WaitUntil(75603);
-      MergeAll(75744, cyan, black);
-      WaitUntil(75774);
-      MergeAll(75915, cyan, black);
-      WaitUntil(75945);
-      MergeAll(76086, cyan, black);
-      WaitUntil(76116);
-      Strobe(77577,cyan);
-      Strobe(78955,yellow);
+
+      //The numbers in this function are start time of repeating section, end time of repeating section, number of intervals
+      BeatCalculator(63645, 67477, 5); for (uint32_t timer = x; timer < y; timer = timer + z)
+      {
+        MergeCrazyBars (timer, cyan, black);
+      }
+
+      //The numbers in this function are start time of repeating section, end time of repeating section, number of intervals
+      BeatCalculator(67477, 73375, 17); for (uint32_t timer = x; timer < y; timer = timer + z)
+      {
+        MergeCrazyBars (timer - 70, cyan, black);
+        Canopy(black);
+        TailBoom(black);
+        WaitUntil(timer);
+      }
+
+      //The numbers in this function are start time of repeating section, end time of repeating section, number of intervals
+      BeatCalculator(73375, 76146, 16); for (uint32_t timer = x; timer < y; timer = timer + z)
+      {
+        MergeAll(timer - 45, cyan, black);
+        All(black);
+        WaitUntil(timer);
+      }
+
+      Strobe(77577, cyan);
+      Strobe(78955, yellow);
+      All(black);
+      WaitUntil(79946);
+      MergeAll(80434, yellow, black);
+      TailFin(red);
+      TailBoom(yellow);
+      SkidsUnder(yellow);
+      SkidsSide(red);
+      DiscoPalette(86169, LiquidGold_p, 210, 15);
+      Canopy(black);
+      TailBoom(blue);
+      SkidsSide(blue);
+      SkidsUnder(red);
+      WaitUntil(86426);
+      SpectrumFire(88050, BlueBurst_p, 10, 100);
+      TailBoom(yellow);
+      SkidsUnder(yellow);
+      SkidsSide(red);
+      DiscoPalette(97577, LiquidGold_p, 210, 15);
+      Canopy(black);
+      TailBoom(blue);
+      SkidsSide(blue);
+      SkidsUnder(red);
+      SpectrumFire(99240, BlueBurst_p, 10, 100);
+      Skids(yellow);
+      TailFin(yellow);
+      MergeCanopyTailBoom(99676, blue, black);
+      Canopy(black);
+      TailBoom(black);
+      WaitUntil(99726);
+      MergeCanopyTailBoom(100156, blue, black);
+      Canopy(black);
+      TailBoom(black);
+      WaitUntil(100206);
+      MergeCanopyTailBoom(100645, blue, black);
+      Canopy(black);
+      TailBoom(black);
+      WaitUntil(100695);
+      MergeAll(100897, white, black);
+      All(black);
+      WaitUntil(101159);
+      Skids(cyan);
+      TailFin(cyan);
+      MergeCanopyTailBoom(103820, red, black);
+      Skids(yellow);
+      TailFin(yellow);
+      Canopy(blue);
+      TailBoom(blue);
+      WaitUntil(104663);
+      MergeCanopyTailBoom(105004, red, black);
+      Skids(cyan);
+      TailFin(cyan);
+      TailBoom(red);
+      Canopy(red);
+      WaitUntil(107287);
 
       All(black);
       Finish();
@@ -1489,10 +1765,16 @@ void loop()
 
       // DON'T CHANGE THE LINES BELOW!
       break; // end of run mode
+
+    default:
+
+      ScrollText("rNO SIGNAL", 1);
+      break;
+
+
+
   } // end of switch case
 } // end of loop
-
-
 
 
 
