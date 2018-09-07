@@ -36,7 +36,7 @@ void setup() {
   rf95.setThisAddress(UNIQUE_ADDRESS);
 
     Wire.begin(8);                // join i2c bus with address #8
-  Wire.onRequest(requestEvent); // register event
+  Wire.onRequest(I2C_request); // register event
 
 
   // only necessary for debugging
@@ -121,22 +121,14 @@ void Printout() // just for serial debugging
   Serial.print(" RSSI: ");
   Serial.println(rf95.lastRssi(), DEC);
   Serial.println();
-
 }
 
-
-// function that executes whenever data is requested by master
-// this function is registered as an event, see setup()
-void requestEvent() {
-  Wire.write(mode); // respond with message of 6 bytes
-  // as expected by master
+// function that executes whenever data is requested by master, see setup()
+void I2C_request() {
+ Wire.write(mode); // respond with just 1 byte, which is the mode
 }
 
-void loop() {
-
+void loop() { //loop just keeps requesting data from the radio
   RadioCheck();
-
   Printout();
-
-
 }
