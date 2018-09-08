@@ -10,10 +10,12 @@
 #include <RHDatagram.h>
 #include <Wire.h>
 
+
 // DEFINE RADIO PINS ON UNO
 #define RFM95_CS 4
 #define RFM95_RST 2
 #define RFM95_INT 3
+
 
 //INITIALISE RADIO
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
@@ -35,7 +37,8 @@ void setup() {
   // set the unique address of this receiver
   rf95.setThisAddress(UNIQUE_ADDRESS);
 
-    Wire.begin(8);                // join i2c bus with address #8
+    Wire.begin(2);                // join i2c bus with address #2
+  //  Wire.setClock(100000);
   Wire.onRequest(I2C_request); // register event
 
 
