@@ -1,8 +1,22 @@
 // This code is for UNO-based 433MHz receivers connected to other boards by I2C
 
-// THIS IS MY UNIQUE ADDRESS AND IT MUST MATCH THE ADDRESS IN THE TRANSMITTER
+// THIS IS YOUR UNIQUE ADDRESS (from 0-254) AND IT MUST MATCH THE ADDRESS IN THE TRANSMITTER
 // PLEASE CHANGE THIS FROM 43 AS THAT IS WHAT HAMISH IS USING!
 #define UNIQUE_ADDRESS 43
+
+// THIS DEFINES THE FREQUENCY BAND YOU'RE USING (from 0-8)
+// IT MUST MATCH IN YOUR RECEIVERS AS WELL
+// Hamish is using band 7 so you may want to change it
+// Band 0 = 433.0 MHz
+// Band 1 = 433.2 MHz
+// Band 2 = 433.4 Mhz
+// Band 3 = 433.6 MHz 
+// Band 4 = 433.8 MHz
+// Band 5 = 434.0 MHz
+// Band 6 = 434.2 Mhz
+// Band 7 = 434.4 MHz
+// Band 8 = 434.6 MHz 
+#define FREQUENCY_BAND 7
 
 //include the correct libraries
 #include <SPI.h>
@@ -34,21 +48,22 @@ uint32_t radiomillis;
 
 
 void setup() {
+
+  float frequency=433+(FREQUENCY_BAND*0.2); // set the frequency
   // set the unique address of this receiver
   rf95.setThisAddress(UNIQUE_ADDRESS);
 
-    Wire.begin(2);                // join i2c bus with address #2
+  Wire.begin(2);                // join i2c bus with address #2
   //  Wire.setClock(100000);
   Wire.onRequest(I2C_request); // register event
 
 
   // only necessary for debugging
   Serial.begin(115200);
-  
+
   if (!rf95.init())
     Serial.println("init failed");
-
-
+  rf95.setFrequency(frequency);
   rf95.setModemConfig(RH_RF95::Bw500Cr45Sf128);
 
 }
@@ -128,7 +143,7 @@ void Printout() // just for serial debugging
 
 // function that executes whenever data is requested by master, see setup()
 void I2C_request() {
- Wire.write(mode); // respond with just 1 byte, which is the mode
+  Wire.write(mode); // respond with just 1 byte, which is the mode
 }
 
 void loop() { //loop just keeps requesting data from the radio

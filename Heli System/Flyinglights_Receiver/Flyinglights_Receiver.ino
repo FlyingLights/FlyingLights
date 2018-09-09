@@ -56,6 +56,24 @@ uint16_t rightcanopy [][37] = {
   {999, 999, 999, 29, 30, 31, 999, 7, 8, 9, 10, 11, 12, 13, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999},
 };
 
+// THIS IS YOUR UNIQUE ADDRESS (from 0-254) AND IT MUST MATCH THE ADDRESS IN THE RECEIVERS
+// PLEASE CHANGE THIS FROM 43 AS THAT IS WHAT HAMISH IS USING!
+#define UNIQUE_ADDRESS 43
+
+// THIS DEFINES THE FREQUENCY BAND YOU'RE USING (from 0-8)
+// IT MUST MATCH IN YOUR RECEIVERS AS WELL
+// Hamish is using band 7 so you may want to change it
+// Band 0 = 433.0 MHz
+// Band 1 = 433.2 MHz
+// Band 2 = 433.4 Mhz
+// Band 3 = 433.6 MHz 
+// Band 4 = 433.8 MHz
+// Band 5 = 434.0 MHz
+// Band 6 = 434.2 Mhz
+// Band 7 = 434.4 MHz
+// Band 8 = 434.6 MHz 
+#define FREQUENCY_BAND 7
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // END OF CUSTOM SETUP ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,10 +94,6 @@ uint16_t rightcanopy [][37] = {
 #define RFM95_CS 8
 #define RFM95_RST 4
 #define RFM95_INT 3
-
-// THIS IS MY UNIQUE ADDRESS AND IT MUST MATCH THE ADDRESS IN THE TRANSMITTER
-// PLEASE CHANGE THIS FROM 43 AS THAT IS WHAT HAMISH IS USING!
-#define UNIQUE_ADDRESS 43
 
 //initialise the radio
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
@@ -473,6 +487,8 @@ DEFINE_GRADIENT_PALETTE( Topographic_p ) {
 void setup()
 {
 
+      float frequency=433+(FREQUENCY_BAND*0.2); // set the frequency
+
   //put the value of COLUMNS into the variables in starlights[] array to get it ready
   for (uint8_t f = 0; f < ROWS; f ++ ) {
     starlights[f] = COLUMNS;
@@ -514,7 +530,7 @@ void setup()
   if (!rf95.init())
     Serial.println("init failed");
 
-
+  rf95.setFrequency(frequency);
   rf95.setModemConfig(RH_RF95::Bw500Cr45Sf128);
 }
 

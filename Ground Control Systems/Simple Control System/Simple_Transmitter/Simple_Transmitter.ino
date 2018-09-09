@@ -1,6 +1,24 @@
 // This code is written to run on a Feather M0 LORA 433Mhz
 // https://www.adafruit.com/product/3179
 
+// THIS IS YOUR UNIQUE ADDRESS (from 0-254) AND IT MUST MATCH THE ADDRESS IN THE RECEIVERS
+// PLEASE CHANGE THIS FROM 43 AS THAT IS WHAT HAMISH IS USING!
+#define UNIQUE_ADDRESS 43
+
+// THIS DEFINES THE FREQUENCY BAND YOU'RE USING (from 0-8)
+// IT MUST MATCH IN YOUR RECEIVERS AS WELL
+// Hamish is using band 7 so you may want to change it
+// Band 0 = 433.0 MHz
+// Band 1 = 433.2 MHz
+// Band 2 = 433.4 Mhz
+// Band 3 = 433.6 MHz 
+// Band 4 = 433.8 MHz
+// Band 5 = 434.0 MHz
+// Band 6 = 434.2 Mhz
+// Band 7 = 434.4 MHz
+// Band 8 = 434.6 MHz 
+#define FREQUENCY_BAND 7
+
 // setup for 433mhz lora radio
 #include <SPI.h> //include SPI library
 #include <RH_RF95.h> //include radiohead library
@@ -46,6 +64,8 @@ uint32_t startmillis;
 
 void setup() {
 
+    float frequency=433+(FREQUENCY_BAND*0.2); // set the frequency
+
   pinMode(LEDPin, OUTPUT);
   pinMode(PedalPin, INPUT_PULLUP);
   Serial.print("initial mode:");
@@ -56,11 +76,12 @@ void setup() {
     myData.spectrum[f] = 0  ;
   }
 
+// only necessary for debugging
   Serial.begin(115200);
+  
   if (!rf95.init())
     Serial.println("init failed");
-  // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
-  rf95.setPreambleLength(8);
+  rf95.setFrequency(frequency);
   rf95.setModemConfig(RH_RF95::Bw500Cr45Sf128); // set the radio to work fast
 }
 
