@@ -19,8 +19,6 @@
 // Band 8 = 434.6 MHz
 #define FREQUENCY_BAND 7
 
-#define TRANSMITTER_ADDRESS 42
-
 #include <SPI.h>
 #include <RH_RF95.h>
 #include <RHDatagram.h>
@@ -45,7 +43,7 @@ CMSGEQ7<MSGEQ7_SMOOTH, pinReset, pinStrobe, pinAnalogLeft, pinAnalogRight> MSGEQ
 
 //INITIALISE RADIO
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
-RHDatagram manager(rf95, TRANSMITTER_ADDRESS);
+RHDatagram manager(rf95, UNIQUE_ADDRESS);
 
 // THIS DATA STRUCURE MATCHES THE ONE ON THE RECEIVER
 struct dataStruct {
@@ -81,7 +79,8 @@ void setup()
   Serial.begin(115200);
   if (!rf95.init())
     Serial.println("init failed");
-  rf95.setFrequency(frequency);
+  rf95.setFrequency(frequency); //set the frequency to match the selected band
+  rf95.setTxPower(23); //turn up the transmitter power!
   rf95.setModemConfig(RH_RF95::Bw500Cr45Sf128); // set the radio to work fast
 }
 

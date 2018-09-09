@@ -11,12 +11,12 @@
 // Band 0 = 433.0 MHz
 // Band 1 = 433.2 MHz
 // Band 2 = 433.4 Mhz
-// Band 3 = 433.6 MHz 
+// Band 3 = 433.6 MHz
 // Band 4 = 433.8 MHz
 // Band 5 = 434.0 MHz
 // Band 6 = 434.2 Mhz
 // Band 7 = 434.4 MHz
-// Band 8 = 434.6 MHz 
+// Band 8 = 434.6 MHz
 #define FREQUENCY_BAND 7
 
 // setup for 433mhz lora radio
@@ -29,15 +29,9 @@
 #define RFM95_RST 4
 #define RFM95_INT 3
 
-// THIS IS MY UNIQUE ADDRESS AND IT MUST MATCH THE ADDRESS IN THE TRANSMITTER
-// PLEASE CHANGE THIS FROM 43 AS THAT IS WHAT HAMISH IS USING!
-#define UNIQUE_ADDRESS 43
-
-#define TRANSMITTER_ADDRESS 42
-
 //INITIALISE RADIO
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
-RHDatagram manager(rf95, TRANSMITTER_ADDRESS);
+RHDatagram manager(rf95, UNIQUE_ADDRESS);
 
 const int PedalPin = A2;
 const int LEDPin = 13;
@@ -64,7 +58,7 @@ uint32_t startmillis;
 
 void setup() {
 
-    float frequency=433+(FREQUENCY_BAND*0.2); // set the frequency
+  float frequency = 433 + (FREQUENCY_BAND * 0.2); // set the frequency
 
   pinMode(LEDPin, OUTPUT);
   pinMode(PedalPin, INPUT_PULLUP);
@@ -76,21 +70,22 @@ void setup() {
     myData.spectrum[f] = 0  ;
   }
 
-// only necessary for debugging
+  // only necessary for debugging
   Serial.begin(115200);
-  
+
   if (!rf95.init())
     Serial.println("init failed");
-  rf95.setFrequency(frequency);
+  rf95.setFrequency(frequency); //set the frequency to match the selected band
+  rf95.setTxPower(23); //turn up the transmitter power!
   rf95.setModemConfig(RH_RF95::Bw500Cr45Sf128); // set the radio to work fast
 }
 
 void loop() {
 
-    // read the state of the pedal into a local variable:
- uint8_t reading = digitalRead(PedalPin);
+  // read the state of the pedal into a local variable:
+  uint8_t reading = digitalRead(PedalPin);
 
-   // If the pedal has changed:
+  // If the pedal has changed:
   if (reading != lastPedalState) {
     // reset the debouncing timer
     lastDebounceTime = millis();
@@ -111,7 +106,7 @@ void loop() {
     }
   }
 
-    // set the LED:
+  // set the LED:
   digitalWrite(LEDPin, mode);
 
   // save the reading.  Next time through the loop,
@@ -142,9 +137,9 @@ void loop() {
     }
   }
 
-Serial.println(mode);
+  Serial.println(mode);
 
-// split up millisec into three octets. 
+  // split up millisec into three octets.
   myData.millisec[0] = millisec;
   myData.millisec[1] = millisec >> 8;
   myData.millisec[2] = millisec >> 16;
@@ -153,7 +148,7 @@ Serial.println(mode);
   byte zize = sizeof(myData);
   Serial.println("Sending to rf95_server");
 
-  manager.sendto((uint8_t *)tx_buf, zize,UNIQUE_ADDRESS); //send the data
+  manager.sendto((uint8_t *)tx_buf, zize, UNIQUE_ADDRESS); //send the data
 
   rf95.waitPacketSent(); // wait until it is sent
 
