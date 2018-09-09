@@ -73,17 +73,12 @@ void loop()
 
   if (digitalRead(RunPin)) { //IF IT IS RUNNING
 
-    rf95.setHeaderId(1);
- //   myData.mode = 1;                    //RUN IS 1
+    rf95.setHeaderId(1); //mode is transmitted in the header.Run is 1
     if (millisec == 15000000) { //IF IT HAS BEEN STOPPED
       startmillis = millis();  //RESTART THE TIMER TO NOW
     }
 
-
-
     millisec = millis() - startmillis; //CALCULATE THE RUN TIME
-
-
     bool newReading = MSGEQ7.read(); //NEW MSGEQ7 READING
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = mapNoise(MSGEQ7.get(f))  ; // PUT IT IN myData.spectrum
@@ -91,10 +86,7 @@ void loop()
   }
   else if (digitalRead(ReadyPin)) {
 
-        rf95.setHeaderId(2);
- //   myData.mode = 2;                    //READY IS 2
-
-    
+        rf95.setHeaderId(2);    //mode is transmitted in the header. Ready is 2
     millisec = 15000000;  // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = 0  ;
@@ -102,26 +94,25 @@ void loop()
   }
   else if (digitalRead(DemoPin)) {
 
-        rf95.setHeaderId(4);
- //   myData.mode = 4;                    //DEMO IS 4
+        rf95.setHeaderId(4);   //mode is transmitted in the header. Demo is 4
+
     millisec = 15000000; // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
+    bool newReading = MSGEQ7.read(); //NEW MSGEQ7 READING
     for (uint8_t f = 0; f < 7; f++) {
-      myData.spectrum[f] = f * 30 ;   // not actually useful just something I was testing!
+      myData.spectrum[f] = mapNoise(MSGEQ7.get(f))  ; // PUT IT IN myData.spectrum
     }
   }
   else {
 
-        rf95.setHeaderId(3);
- //   myData.mode = 3;                    //STOP IS 3
+        rf95.setHeaderId(3);  //mode is transmitted in the header. Stop is 3
+        
     millisec = 15000000; // this is vital. It means the run routine goes straight through all the "Untils" if it comes out of run mid routine. 
     for (uint8_t f = 0; f < 7; f++) {
       myData.spectrum[f] = 0 ;
     }
   }
 
- // Serial.println(myData.mode); // just debugging
-
-// split up millisec into four octets. Probably doesn't need the last one but I haven't taken it out yet!
+// split up millisec into three octets. 
   myData.millisec[0] = millisec;
   myData.millisec[1] = millisec >> 8;
   myData.millisec[2] = millisec >> 16;
