@@ -63,7 +63,6 @@ int LastPlaying = 0;
 // will quickly become a bigger number than can be stored in an int.
 unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
 unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
-uint32_t startplaying;
 
 void setup() {
 
@@ -204,7 +203,6 @@ void loop() {
         if (RunLEDState == LOW) { // if it was not in run mode already
           musicPlayer.stopPlaying(); //stop playing first in case it was in demo mode
           musicPlayer.startPlayingFile("music.mp3"); // play the run music
-          startplaying = millis();
           StopLEDState = LOW;
           RunLEDState = HIGH;
           ReadyLEDState = LOW;
@@ -232,7 +230,6 @@ void loop() {
         if (RunLEDState == LOW) { // if it was not in run mode already
           musicPlayer.stopPlaying();  // stop playing first in case it was in demo mode
           musicPlayer.startPlayingFile("music.mp3");  // play the run music
-          startplaying = millis();
           StopLEDState = LOW;
           RunLEDState = HIGH;
           ReadyLEDState = LOW;
@@ -252,7 +249,6 @@ void loop() {
         if (DemoLEDState == LOW) {  //if it was not in demo mode already.
           musicPlayer.stopPlaying();  //stop playing first
           musicPlayer.startPlayingFile("demo.mp3");  // play the demo music
-          startplaying = millis();
           StopLEDState = LOW;
           RunLEDState = LOW;
           ReadyLEDState = LOW;
