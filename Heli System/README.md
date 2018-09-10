@@ -1,4 +1,2 @@
-# On the helicopter
-
 ### Flyinglights_Receiver.ino
-This code runs on a Feather M0 LORA board that receives radio data and drives the onboard RGB LEDs.
+This is the code that runs on a Feather M0 LORA board. It receives radio data from the ground control system and drives the onboard RGB LEDs.
