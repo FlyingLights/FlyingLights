@@ -4,15 +4,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// for the three lines below it can be worth setting one more
-// than the actual number of pixels if the last pixel is behaving oddly
-#define CTOTALPIXELS 342 //TOTALNUMBER OF PIXELS ON THE CANOPY
-#define STOTALPIXELS 23 //total number of pixels on the skids
-#define TTOTALPIXELS 47 //TOTALNUMBER OF PIXELS ON THE tail
+// The three lines below refer to the number of individually referenced pixels on the heli
+// see the Wiki page for more details about how to calculate this, especially on the tail
+// and skids where the number of individually referenced pixels is less than the actual number
+// Finally it is probably best to add one to these numbers as the last pixel can sometimes
+// exhibit odd behaviour.
+#define CTOTALPIXELS 342 //Number of LEDs on the canopy
+#define STOTALPIXELS 23 //Number of (individually referenced) LEDs on the skids
+#define TTOTALPIXELS 47 //Number of (individually referenced) LEDs on the tail boom and fin
 
 // this defines the number of ROWS (horizontal strips) and
-// COLUMNS (number of LEDS on the longest strip)
-// on your heli canopy
+// COLUMNS (number of LEDS on the longest strip) on your heli canopy
 #define COLUMNS 37 // THE NUMBER OF COLUMNS OF CANOPY LEDS
 #define ROWS 8 // THE NUMBER OF ROWS OF CANOPY LEDS
 
