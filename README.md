@@ -1,4 +1,4 @@
-# Welcome FlyingLights
+# Welcome
 
 These pages include everything you need to know to build a night-flying model helicopter with an RGB LED light show perfectly timed to music. It has been developed by Malcolm & Hamish Morley and has come from several years of flying, experimenting, coding and competing. We hope you enjoy building and flying one of these amazing machines as much as we have.
 
