@@ -68,12 +68,12 @@ uint16_t rightcanopy [][37] = {
 // Band 0 = 433.0 MHz
 // Band 1 = 433.2 MHz
 // Band 2 = 433.4 Mhz
-// Band 3 = 433.6 MHz 
+// Band 3 = 433.6 MHz
 // Band 4 = 433.8 MHz
 // Band 5 = 434.0 MHz
 // Band 6 = 434.2 Mhz
 // Band 7 = 434.4 MHz
-// Band 8 = 434.6 MHz 
+// Band 8 = 434.6 MHz
 #define FREQUENCY_BAND 7
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,8 +172,17 @@ bool on_off; // a handy reuseable global boolean variable!
 // in run mode it is set to FALSE and the functions will execute until a particular time is reached
 bool runthrough;
 
-// Setup a dynamic palette for use in palette-based functions
-CRGBPalette16 FLpal;
+
+//Predefined Palettes
+/// Cloudy color pallete: CloudColors_p
+/// Lava colors: LavaColors_p
+/// Ocean colors, blues and whites: OceanColors_p
+/// Forest colors, greens: ForestColors_p
+/// HSV Rainbow: RainbowColors_p
+/// HSV Rainbow colors with alternatating stripes of black: RainbowStripeColors_p
+/// HSV color ramp: blue purple ping red orange yellow (and back): PartyColors_p
+/// Approximate "black body radiation" palette: HeatColors_p
+
 
 DEFINE_GRADIENT_PALETTE( CandyStore_p ) {
   0, 255, 255, 255,
@@ -489,7 +498,7 @@ DEFINE_GRADIENT_PALETTE( Topographic_p ) {
 void setup()
 {
 
-      float frequency=433+(FREQUENCY_BAND*0.2); // set the frequency
+  float frequency = 433 + (FREQUENCY_BAND * 0.2); // set the frequency
 
   //put the value of COLUMNS into the variables in starlights[] array to get it ready
   for (uint8_t f = 0; f < ROWS; f ++ ) {
@@ -643,6 +652,34 @@ void All(CRGB colour) // set the whole heli to a solid colour
   Skids(colour);
 }
 
+void Flash(CRGB colour) // set the whole heli to a solid colour
+{
+
+  if (radiomillis < 14999999)
+  {
+    Canopy(colour);
+    Tail(colour);
+    Skids(colour);
+    Show();
+    delay(10);
+  }
+}
+
+void LongFlash(CRGB colour) // set the whole heli to a solid colour
+{
+
+  if (radiomillis < 14999999)
+  {
+    Canopy(colour);
+    Tail(colour);
+    Skids(colour);
+    Show();
+    delay(70);
+  }
+}
+
+
+
 void TailFin(CRGB colour) // set the tail fin to a solid colour
 {
   fill_solid( &(tstrip[TAILFINFIRST]), TAILFINLAST - TAILFINFIRST + 1 , colour );
@@ -698,6 +735,17 @@ void Finish()  // when this is reached it will hold until another mode is select
     RadioCheck();
     Printout();
   }
+}
+
+void RandomCol() {
+
+  m = m + random(55, 200);
+  Canopy(CHSV(m, 255, 255));
+  TailBoom(CHSV(m + 60, 255, 255));
+  SkidsUnder(CHSV(m + 120, 255, 255));
+  SkidsSide(CHSV(m + 180, 255, 255));
+  TailFin(CHSV(m + 180, 255, 255));
+
 }
 
 
@@ -773,6 +821,7 @@ void SparkleAll(uint32_t waituntil, float howmany1, CRGB colour1, uint8_t fade)
     }
   }
 }
+
 
 
 void TwoSparkleAll(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
@@ -858,6 +907,51 @@ void TwoSparkleCanopy(uint32_t waituntil, float howmany1, CRGB colour1, CRGB col
     nscale8(cstrip, CTOTALPIXELS, fade);
 
     RadioCheck();
+    if (runthrough) {
+      break;
+    }
+  }
+}
+
+void TwoSparkleCanopyTail(uint32_t waituntil, float howmany1, CRGB colour1, CRGB colour2, uint8_t fade)
+{
+
+  howmany1 *= 100;
+  while (radiomillis < waituntil || runthrough)
+  {
+
+
+    for (uint16_t j = 0; j < CTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        if (random8() < 128) {
+          cstrip[j] = colour1;
+        }
+        else
+        {
+          cstrip[j] = colour2;
+        }
+      }
+    }
+
+    for (uint16_t j = 0; j < TTOTALPIXELS; j++) {
+      if (random16(10000) < howmany1) {
+        if (random8() < 128) {
+          tstrip[j] = colour1;
+        }
+        else
+        {
+          tstrip[j] = colour2;
+        }
+      }
+
+    }
+
+    FastLED.show();
+    nscale8(cstrip, CTOTALPIXELS, fade);
+    nscale8(tstrip, TTOTALPIXELS, fade);
+
+    RadioCheck();
+
     if (runthrough) {
       break;
     }
@@ -1408,6 +1502,37 @@ void BigBlock (int8_t row, int8_t column,  CRGB colour) {
 }
 
 
+void PaletteStrobe(uint32_t until, CRGBPalette16 palette1) {
+
+  while (radiomillis < until || runthrough)
+  {
+
+    Canopy(ColorFromPalette(palette1, random8()));
+    Tail(ColorFromPalette(palette1, random8()));
+    Skids(ColorFromPalette(palette1, random8()));
+
+    Show();
+
+    delay(5);
+    Canopy(black);
+    Tail(black);
+    Skids(black);
+
+    Show();
+    delay(45);
+
+    //check the radio
+    RadioCheck();
+    if (runthrough) {
+      break;
+    }
+  }
+
+}
+
+
+
+
 
 void DiscoPalette (uint32_t until, CRGBPalette16 palette1, uint8_t fade, uint8_t slowness) { // Disco effect based on a palette
 
@@ -1506,98 +1631,145 @@ void SpriteBothSides (uint8_t ascii, int16_t row, int16_t column,  CRGB colour) 
 }
 
 
+
+
+
+
+
 void ScrollText(char text[], uint8_t row) {
 
-  CRGB colour = white;
-  int16_t firstcolumn = COLUMNS;
-  int16_t place;
-  int16_t endplace = COLUMNS;
-  uint8_t length = strlen(text);
-  Serial.print("strlen:");
-  Serial.println(length);
-  while (endplace > 0) {
-    place = firstcolumn;
+  if (mode !=3) {
 
-
-
-    for (uint8_t f = 0; f < length; f++) {
-      uint8_t ff = text[f];
-
-
-      if (ff > 95) // all the lower case letters and other stuff I don't use are >95
-      {
-        if (ff == 114) {
-          colour = red;  //r goes to red
-        }
-        if (ff == 115) {
-          colour = dullred;  //d goes to dullred
-        }
-        else if (ff == 103) {
-          colour = green; //g goes to green
-        }
-        else if (ff == 104) {
-          colour = dullgreen; //h goes to dullgreen
-        }
-        else if (ff == 98) {
-          colour = blue; //b goes to blue
-        }
-        else if (ff == 97) {
-          colour = dullblue; //a goes to dullblue
-        }
-        else if (ff == 121) {
-          colour = yellow; //y goes to yellow
-        }
-        else if (ff == 122) {
-          colour = dullyellow; //z goes to dullyellow
-        }
-        else if (ff == 109) {
-          colour = magenta; //m goes to magenta
-        }
-        else if (ff == 99) {
-          colour = cyan; //c goes to cyan
-        }
-        else if (ff == 100) {
-          colour = cyan; //d goes to dullcyan
-        }
-        else if (ff == 119) {
-          colour = white; //w goes to white
-        }
-        else if (ff == 116) {
-          colour = lightgrey; //t goes to lightgrey
-        }
-        else if (ff == 117) {
-          colour = grey; //u goes to grey
-        }
-                else if (ff == 118) {
-          colour = dullgrey; //v goes to dullgrey
-        }
-                        else if (ff == 111) {
-          colour = orange; //o goes to orange
-        }
-                                else if (ff == 111) {
-          colour = orange; //o goes to orange
-        }
-       
-
+    do
+    {
+      if (mode == 2 | mode == 4) {
+        runthrough = true;
       }
-      else {
-        SpriteBothSides (ff, row, place, colour);
-        place = place + m + 2;
-        Serial.print("m:");
-        Serial.print(m);
+
+
+      CRGB colour = white;
+      int16_t firstcolumn = COLUMNS;
+      int16_t place;
+      int16_t endplace = COLUMNS;
+      uint8_t length = strlen(text);
+      Serial.print("strlen:");
+      Serial.println(length);
+      while (endplace > 0) {
+        place = firstcolumn;
+
+
+
+        for (uint8_t f = 0; f < length; f++) {
+          uint8_t ff = text[f];
+
+
+          if (ff > 95) // all the lower case letters and other stuff I don't use are >95
+          {
+            if (ff == 114) {
+              colour = red;  //r goes to red
+            }
+            if (ff == 115) {
+              colour = dullred;  //d goes to dullred
+            }
+            else if (ff == 103) {
+              colour = green; //g goes to green
+            }
+            else if (ff == 104) {
+              colour = dullgreen; //h goes to dullgreen
+            }
+            else if (ff == 98) {
+              colour = blue; //b goes to blue
+            }
+            else if (ff == 97) {
+              colour = dullblue; //a goes to dullblue
+            }
+            else if (ff == 121) {
+              colour = yellow; //y goes to yellow
+            }
+            else if (ff == 122) {
+              colour = dullyellow; //z goes to dullyellow
+            }
+            else if (ff == 109) {
+              colour = magenta; //m goes to magenta
+            }
+            else if (ff == 99) {
+              colour = cyan; //c goes to cyan
+            }
+            else if (ff == 100) {
+              colour = cyan; //d goes to dullcyan
+            }
+            else if (ff == 119) {
+              colour = white; //w goes to white
+            }
+            else if (ff == 116) {
+              colour = lightgrey; //t goes to lightgrey
+            }
+            else if (ff == 117) {
+              colour = grey; //u goes to grey
+            }
+            else if (ff == 118) {
+              colour = dullgrey; //v goes to dullgrey
+            }
+            else if (ff == 111) {
+              colour = orange; //o goes to orange
+            }
+            else if (ff == 111) {
+              colour = orange; //o goes to orange
+            }
+
+
+          }
+          else {
+            SpriteBothSides (ff, row, place, colour);
+            place = place + m + 2;
+            Serial.print("m:");
+            Serial.print(m);
+          }
+        }
+
+        Show();
+        Canopy(black);
+        endplace = place;
+
+        firstcolumn--;
+        Serial.print(" endplace:");
+        Serial.println(endplace);
+      }
+
+    } while (!runthrough);
+  }
+}
+
+void RainbowCanopyTailBoom(uint32_t until) {
+  Skids(white);
+
+  while (radiomillis < until || runthrough)
+  {
+
+    m = m + 5;  //use one of the re-useable global variables
+    for (int j = 0; j < COLUMNS; j++) {
+      for (int q = 0; q < ROWS; q++) {
+        CRGB hue = CHSV(m + (j * 5), 255, 255);
+        cstrip[(leftcanopy [q][COLUMNS - (1 + j)])] = hue;
+        cstrip[(rightcanopy [q][j])] = hue;
       }
     }
 
-    Show();
-    Canopy(black);
-    endplace = place;
+    for (int j = 0; j < TTOTALPIXELS; j++) {
+      tstrip[j] = CHSV(m - (j * 5), 255, 255);
+    }
 
-    firstcolumn--;
-    Serial.print(" endplace:");
-    Serial.println(endplace);
+
+    Show();
+    RadioCheck();
+    if (runthrough) {
+      break;
+    }
   }
 
+
 }
+
 
 
 void loop()
@@ -1608,7 +1780,7 @@ void loop()
 
   switch (mode) { // go different ways depending on the current radio mode
 
-    case 2:  //ready mode when radio.mode=2
+    case 2:  //ready mode when mode=2
       runthrough = true;
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1620,7 +1792,7 @@ void loop()
 
       break; // end of ready mode
 
-    case 3:  // stop mode when radio.mode=3
+    case 3:  // stop mode when mode=3
       runthrough = true;
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1632,7 +1804,7 @@ void loop()
       Show();
       break; // end of stop mode
 
-    case 4:   // demo mode when radio.mode=4
+    case 4:   // demo mode when mode=4
       runthrough = true;
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1647,7 +1819,7 @@ void loop()
 
       break; // end of demo mode
 
-    case 1: //run mode when radio.mode=1
+    case 1: //run mode when mode=1
       runthrough = false;
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1673,13 +1845,13 @@ void loop()
       SparkleCanopyTailBoom(32322, 1, yellow, 200); //up to dramatic
       MergeAll(32722, black, red); //up to "but tonight"
       WaitUntil(35573);
-      Starlights(38452, red, 200, 5);
-      TailFin(cyan);
+      ReverseStarlights(38452, red, 200, 5);
+      Tail(cyan);
       Skids(cyan);
-      Starlights(41723, cyan, 200, 5);
-      TailFin(green);
+      ReverseStarlights(41723, cyan, 200, 5);
+      Tail(green);
       Skids(green);
-      Starlights(47554, green, 200, 5);
+      ReverseStarlights(47554, green, 200, 5);
       MergeAll(48054, black, orange); //this is the start of whaa
       WaitUntil(52616);
       Skids(orange);
@@ -1691,15 +1863,18 @@ void loop()
       WaitUntil(60929);
       SparkleMerge1(63545, 50, yellow, black, 20); //Ba4 up to Building up
       WaitUntil(63645);
-
+      Skids(cyan);
+      Tail(cyan);
       //The numbers in this function are start time of repeating section, end time of repeating section, number of intervals
-      BeatCalculator(63645, 67477, 5); for (uint32_t timer = x; timer < y; timer = timer + z)
+      BeatCalculator(63645, 67477, 5);
+      for (uint32_t timer = x; timer < y; timer = timer + z)
       {
         MergeCrazyBars (timer, cyan, black);
       }
 
       //The numbers in this function are start time of repeating section, end time of repeating section, number of intervals
-      BeatCalculator(67477, 73375, 17); for (uint32_t timer = x; timer < y; timer = timer + z)
+      BeatCalculator(67477, 73375, 17);
+      for (uint32_t timer = x; timer < y; timer = timer + z)
       {
         MergeCrazyBars (timer - 70, cyan, black);
         Canopy(black);
@@ -1708,7 +1883,8 @@ void loop()
       }
 
       //The numbers in this function are start time of repeating section, end time of repeating section, number of intervals
-      BeatCalculator(73375, 76146, 16); for (uint32_t timer = x; timer < y; timer = timer + z)
+      BeatCalculator(73375, 76146, 16);
+      for (uint32_t timer = x; timer < y; timer = timer + z)
       {
         MergeAll(timer - 45, cyan, black);
         All(black);
@@ -1724,7 +1900,7 @@ void loop()
       TailBoom(yellow);
       SkidsUnder(yellow);
       SkidsSide(red);
-      DiscoPalette(86169, LiquidGold_p, 210, 15);
+      DiscoPalette(86169, LiquidGold_p, 175, 10);
       Canopy(black);
       TailBoom(blue);
       SkidsSide(blue);
@@ -1734,7 +1910,7 @@ void loop()
       TailBoom(yellow);
       SkidsUnder(yellow);
       SkidsSide(red);
-      DiscoPalette(97577, LiquidGold_p, 210, 15);
+      DiscoPalette(97577, LiquidGold_p, 175, 10);
       Canopy(black);
       TailBoom(blue);
       SkidsSide(blue);
@@ -1765,14 +1941,107 @@ void loop()
       Canopy(blue);
       TailBoom(blue);
       WaitUntil(104663);
-      MergeCanopyTailBoom(105004, red, black);
+      MergeCanopyTailBoom(104663 + 341, blue, black);
       Skids(cyan);
       TailFin(cyan);
       TailBoom(red);
       Canopy(red);
       WaitUntil(107287);
-
+      MergeCanopyTailBoom(107287 + 302, red, black);
+      SkidsSide(yellow);
+      TailFin(yellow);
+      TailBoom(blue);
+      SkidsUnder(yellow);
+      Canopy(blue);
+      WaitUntil(108522);
+      MergeCanopyTailBoom(108522 + 255, blue, black);
+      SkidsSide(cyan);
+      TailFin(cyan);
+      TailBoom(red);
+      SkidsUnder(cyan);
+      Canopy(red);
+      WaitUntil(111705);
+      MergeCanopyTailBoom(111705 + 952, red, black);
+      SkidsSide(cyan);
+      TailFin(cyan);
+      TailBoom(red);
+      SkidsUnder(cyan);
+      Canopy(red);
+      WaitUntil(114834);
+      SkidsSide(yellow);
+      TailFin(yellow);
+      TailBoom(blue);
+      SkidsUnder(yellow);
+      Canopy(blue);
+      WaitUntil(116693);
       All(black);
+      WaitUntil(116963);
+      MergeAll(116963 + 434, white, black);
+      All(black);
+      WaitUntil(117697);
+      SkidsSide(white);
+      TailFin(white);
+      TailBoom(dullred);
+      SkidsUnder(red);
+      SpectrumTwoColour(133110, white, dullred);
+      PaletteSparkleAll(147249, 5, RainbowColors_p, 175);
+      Flash(white);
+      SparkleMerge1(151085, 5, magenta, red, 175);
+      Flash(white);
+      SparkleMerge1(154955, 5, green, red, 175);
+      Flash(white);
+      SparkleMerge1(158791, 5, blue, orange, 175);
+      Flash(white);
+      SparkleMerge1(162493, 5, cyan, magenta, 175);
+      TailFin(yellow);
+      SkidsSide(magenta);
+      SkidsUnder(blue);
+      Canopy(red);
+      TailBoom(cyan);
+      WaitUntil(163260);
+      SkidsUnder(red);
+      SkidsSide(red);
+      TailFin(red);
+      ShiftingPaletteCanopy(164415, RainbowStripeColors_p, 1, 6, 2);
+      //The numbers in this function are start time of repeating section, end time of repeating section, number of intervals
+      BeatCalculator(164415, 170046, 12);
+      for (uint32_t timer = x; timer < y; timer = timer + z)
+      {
+        LongFlash(white);
+        RandomCol();
+        WaitUntil(timer);
+      }
+      //The numbers in this function are start time of repeating section, end time of repeating section, number of intervals
+      BeatCalculator(170046, 171908, 8);
+      for (uint32_t timer = x; timer < y; timer = timer + z)
+      {
+        LongFlash(white);
+        RandomCol();
+        WaitUntil(timer);
+      }
+      BeatCalculator(171908, 178432, 14);
+      for (uint32_t timer = x; timer < y; timer = timer + z)
+      {
+        LongFlash(white);
+        RandomCol();
+        WaitUntil(timer);
+      }
+      RainbowCanopyTailBoom(189521);
+      Skids(red);
+      TwoSparkleCanopyTail(189722, 35, magenta, white, 175);
+      TwoSparkleCanopyTail(190200, 35, green, white, 175);
+      TwoSparkleCanopyTail(190669, 35, red, white, 175);
+      TwoSparkleCanopyTail(191133, 35, blue, white, 175);
+      TwoSparkleCanopyTail(191610, 35, yellow, white, 175);
+      TwoSparkleCanopyTail(192073, 35, cyan, white, 175);
+      TwoSparkleCanopyTail(193008, 35, green, white, 175);
+      TwoSparkleCanopyTail(193282, 35, red, white, 175);
+      PaletteStrobe(194448, RainbowColors_p);
+      All(black);
+      WaitUntil(196448);
+      Tail(dullred);
+      Skids(dullred);
+      ScrollText("bTEAM_AT", 1);
       Finish();
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1785,7 +2054,7 @@ void loop()
       break; // end of run mode
 
     default:
-
+      runthrough = true;
       ScrollText("rNO SIGNAL", 1);
       break;
 
