@@ -64,6 +64,8 @@ uint32_t startmillis;
 void setup()
 {
 
+
+delay(5000); //delay 5 seconds
   float frequency = 433 + (FREQUENCY_BAND * 0.2); // set the frequency
 
 
